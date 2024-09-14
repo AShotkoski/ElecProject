@@ -234,11 +234,6 @@ LRESULT Window::MessageProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 		// ---------Raw mouse input -----------
 		case WM_INPUT:
 		{
-			// Test if mouse control is enabled for current gfx camera
-			if ( !pGfx->GetCamera().isMouseControlEnabled() )
-			{
-				break;
-			}
 
 			UINT dwSize = 0u;
 
@@ -257,10 +252,9 @@ LRESULT Window::MessageProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 				 pRaw->data.mouse.lLastY != 0))
 			{
 				// Directly update the camera to get as little input lag as possible
-				pGfx->GetCamera().UpdateView( { (float)pRaw->data.mouse.lLastX,
-											    (float)pRaw->data.mouse.lLastY } );
+				
 
-				SetCursorPos( Center_x, Center_y );
+				//SetCursorPos( Center_x, Center_y );
 			}
 			break;
 		}

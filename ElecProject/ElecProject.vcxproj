@@ -140,7 +140,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Src\BaseException.cpp" />
-    <ClCompile Include="Src\Camera.cpp" />
     <ClCompile Include="Src\Game.cpp" />
     <ClCompile Include="Src\Graphics.cpp" />
     <ClCompile Include="Src\Keyboard.cpp" />
@@ -150,7 +149,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\BaseException.h" />
-    <ClInclude Include="Src\Camera.h" />
     <ClInclude Include="Src\Game.h" />
     <ClInclude Include="Src\Graphics.h" />
     <ClInclude Include="Src\Keyboard.h" />

@@ -12,7 +12,6 @@ public:
 private:
 	void UpdateLogic();
 	void DrawFrame();
-	void ControlCamera();
 
 private:
 	Window wnd;

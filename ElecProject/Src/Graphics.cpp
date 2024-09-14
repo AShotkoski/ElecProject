@@ -169,11 +169,6 @@ DirectX::XMMATRIX Graphics::GetProjection() const noexcept
 	return projection;
 }
 
-Camera& Graphics::GetCamera() noexcept
-{
-	return cam;
-}
-
 
 // -------------------------------------------------------------------------------
 // ---------------------------GFX EXCEPTION---------------------------------------

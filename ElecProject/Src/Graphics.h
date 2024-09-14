@@ -1,7 +1,6 @@
 #pragma once
 #include "Win.h"
 #include "BaseException.h"
-#include "Camera.h"
 #include <d3d11.h>
 #include <wrl.h>
 #include <DirectXMath.h>
@@ -40,10 +39,8 @@ public:
 	UINT GetHeight() const;
 	void SetProjection(DirectX::FXMMATRIX proj) noexcept;
 	DirectX::XMMATRIX GetProjection() const noexcept;
-	Camera& GetCamera() noexcept;
 private:
 	DirectX::XMMATRIX projection;
-	Camera cam;
 	// Dimensions of client area
 	UINT Width;
 	UINT Height;
