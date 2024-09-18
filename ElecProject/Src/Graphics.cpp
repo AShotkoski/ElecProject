@@ -119,16 +119,6 @@ void Graphics::BeginFrame()
 	pContext->ClearRenderTargetView(pRenderTargetView.Get(), clearColor);
 }
 
-void Graphics::Draw( UINT vertexCount, UINT start )
-{
-	pContext->Draw( vertexCount, start );
-}
-
-void Graphics::DrawIndexed( UINT indexCount )
-{
-	pContext->DrawIndexed( indexCount, 0u, 0u );
-}
-
 void Graphics::EndFrame()
 {
 
@@ -167,6 +157,21 @@ void Graphics::SetProjection( DirectX::FXMMATRIX proj ) noexcept
 DirectX::XMMATRIX Graphics::GetProjection() const noexcept
 {
 	return projection;
+}
+
+ID3D11Device* Graphics::pGetDevice() const
+{
+	return pDevice.Get();
+}
+
+ID3D11DeviceContext* Graphics::pGetContext() const
+{
+	return pContext.Get();
+}
+
+ID3D11RenderTargetView* Graphics::pGetRTV() const
+{
+	return pRenderTargetView.Get();
 }
 
 

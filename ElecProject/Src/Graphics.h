@@ -32,13 +32,14 @@ public:
 	Graphics& operator=( const Graphics& ) = delete;
 public:
 	void BeginFrame();
-	void Draw( UINT vertexCount, UINT start );
-	void DrawIndexed( UINT indexCount );
 	void EndFrame();
 	UINT GetWidth() const;
 	UINT GetHeight() const;
 	void SetProjection(DirectX::FXMMATRIX proj) noexcept;
 	DirectX::XMMATRIX GetProjection() const noexcept;
+	ID3D11Device* pGetDevice() const;
+	ID3D11DeviceContext* pGetContext() const;
+	ID3D11RenderTargetView* pGetRTV() const;
 private:
 	DirectX::XMMATRIX projection;
 	// Dimensions of client area
