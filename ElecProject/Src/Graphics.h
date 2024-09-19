@@ -51,6 +51,7 @@ private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain>      pSwapChain;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> 		pRenderTarget;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pRenderTargetView;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencilView;
 
 private:
 	/********************** Parameters *******************/

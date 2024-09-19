@@ -13,6 +13,8 @@ private:
 	void UpdateLogic();
 	void DrawFrame();
 
+	void DrawTestCube();
+
 private:
 	Window wnd;
 	Graphics& gfx;
