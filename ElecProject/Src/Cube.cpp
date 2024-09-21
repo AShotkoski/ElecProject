@@ -1,7 +1,10 @@
 #include "Cube.h"
 #include "Macros.h"
 #include <d3dcompiler.h>
-
+namespace shaders
+{
+	#include "PixelShader.shaderheader" // If there is an error, ignore it. File gets created on compilation
+}
 // Namespace definitions in the implementation file
 using namespace Microsoft::WRL;
 namespace dx = DirectX;
@@ -113,28 +116,9 @@ void Cube::InitSharedResources(Graphics& gfx)
 
 	// Pixel Shader
 
-	const char* psCode =
-		"struct PS_INPUT {"
-		"    float4 pos : SV_POSITION;"
-		"    float4 color : COLOR;"
-		"};"
-		"float4 PSMain(PS_INPUT input) : SV_Target {"
-		"    return input.color;"
-		"}";
 
-	ComPtr<ID3DBlob> psBlob;
-	if (FAILED(hr = D3DCompile(psCode, strlen(psCode), nullptr, nullptr, nullptr,
-		"PSMain", "ps_5_0", 0, 0, &psBlob, &errBlob)))
-	{
-		if (errBlob.Get())
-		{
-			OutputDebugStringA((char*)errBlob->GetBufferPointer());
-		}
-		throw GFX_EXCEPT(hr);
-	}
-
-	THROW_FAILED_GFX(gfx.pGetDevice()->CreatePixelShader(psBlob->GetBufferPointer(),
-		psBlob->GetBufferSize(), nullptr, &s_pPixelShader));
+	THROW_FAILED_GFX(gfx.pGetDevice()->CreatePixelShader(shaders::PixelShaderBytecode,
+		sizeof(shaders::PixelShaderBytecode), nullptr, &s_pPixelShader));
 
 	// Create the input layout
 	D3D11_INPUT_ELEMENT_DESC layoutDesc[] =
