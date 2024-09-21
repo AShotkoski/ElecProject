@@ -1,6 +1,7 @@
 #pragma once
 #include "Window.h"
 #include "FrameTimer.h"
+#include "Cube.h"
 
 class Game
 {
@@ -14,12 +15,13 @@ private:
 	void UpdateLogic();
 	void DrawFrame();
 
-	void DrawTestCube();
 
 private:
 	Window wnd;
 	Graphics& gfx;
 	FrameTimer ft;
+
+	Cube cube;
 
 private:
 	float dt = 0;

@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Src\BaseException.cpp" />
+    <ClCompile Include="Src\Cube.cpp" />
     <ClCompile Include="Src\FrameTimer.cpp" />
     <ClCompile Include="Src\Game.cpp" />
     <ClCompile Include="Src\Graphics.cpp" />
@@ -149,6 +150,7 @@
     <ClCompile Include="Src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Cube.h" />
     <ClInclude Include="Src\BaseException.h" />
     <ClInclude Include="Src\FrameTimer.h" />
     <ClInclude Include="Src\Game.h" />
