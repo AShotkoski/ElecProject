@@ -1,5 +1,6 @@
 #pragma once
 #include "Window.h"
+#include "FrameTimer.h"
 
 class Game
 {
@@ -18,9 +19,10 @@ private:
 private:
 	Window wnd;
 	Graphics& gfx;
+	FrameTimer ft;
 
 private:
-
+	float dt = 0;
 private:
 	static constexpr UINT ScreenWidth = 1272u;
 	static constexpr UINT ScreenHeight = 954u;

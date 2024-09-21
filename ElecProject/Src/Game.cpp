@@ -18,6 +18,7 @@ Game::~Game()
 
 void Game::Go()
 {
+	dt = ft.Mark(); // Track frame time 
 	gfx.BeginFrame();
 	UpdateLogic();
 	DrawFrame();
@@ -206,7 +207,13 @@ void Game::DrawTestCube()
 		NearClipping,
 		FarClipping);
 
-	dx::XMMATRIX worldviewproj = view * proj;
+	static float theta = dt;
+	dx::XMMATRIX world = dx::XMMatrixRotationRollPitchYaw(0, theta, 0.01f);
+	theta += dt;
+
+	dx::XMMATRIX worldviewproj = world * view * proj;
+
+
 	worldviewproj = dx::XMMatrixTranspose(worldviewproj); // hlsl wants column major
 
 	ConstantBuffer cb;
