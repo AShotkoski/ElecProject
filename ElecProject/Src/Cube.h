@@ -36,6 +36,7 @@ private:
 	struct ConstBuffer
 	{
 		DirectX::XMMATRIX worldViewProj;
+
 	};
 
 	// Vertex structure

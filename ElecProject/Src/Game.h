@@ -31,6 +31,6 @@ private:
 	static constexpr const wchar_t* WindowTitle = L"Rendering engine";
 	static constexpr float NearClipping = 0.1f;
 	static constexpr float FarClipping = 130.0f;
-	static constexpr float Fov = 80.f;
+	static constexpr float Fov = 70.f; // degrees
 };
 

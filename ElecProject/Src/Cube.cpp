@@ -36,20 +36,12 @@ Cube::Cube(Graphics& gfx)
 
 void Cube::Draw(Graphics& gfx, float dt)
 {
-	dx::XMMATRIX view = dx::XMMatrixLookAtLH(
-		dx::XMVectorSet(0.f, 0.f, -5.f, 1.f), // eye pos
-		dx::XMVectorSet(0.f, 0.f, 0.f, 1.f), // focal pt
-		dx::XMVectorSet(0.f, 1.f, 0.f, 0.f)); // up direction
-	dx::XMMATRIX proj = dx::XMMatrixPerspectiveFovLH(
-		dx::XM_PIDIV2, // FOV
-		gfx.GetWidth() / gfx.GetHeight(), // Aspect ratio
-		0.1f, // near clipping
-		100.f); // far clipping
+	
 	static float theta = dt;
 	dx::XMMATRIX world = dx::XMMatrixRotationRollPitchYaw(0, theta, 0.01f);
 	theta += dt;
 
-	dx::XMMATRIX worldviewproj = world * view * proj;
+	dx::XMMATRIX worldviewproj = world * gfx.GetCamera().GetViewMatrix() * gfx.GetProjection();
 
 	worldviewproj = dx::XMMatrixTranspose(worldviewproj); // HLSL wants column major
 

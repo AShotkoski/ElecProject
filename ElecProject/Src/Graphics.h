@@ -5,7 +5,7 @@
 #include <wrl.h>
 #include <DirectXMath.h>
 #include <memory>
-
+#include "Camera.h"
 
 class Graphics
 {
@@ -40,8 +40,10 @@ public:
 	ID3D11Device* pGetDevice() const;
 	ID3D11DeviceContext* pGetContext() const;
 	ID3D11RenderTargetView* pGetRTV() const;
+	Camera& GetCamera();
 private:
 	DirectX::XMMATRIX projection;
+	Camera camera;
 	// Dimensions of client area
 	UINT Width;
 	UINT Height;

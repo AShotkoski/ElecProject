@@ -10,7 +10,13 @@ Game::Game()
 	, gfx(wnd.GFX())
 	, cube(gfx)
 {
-
+	// Setup the projection matrix
+	gfx.SetProjection(dx::XMMatrixPerspectiveFovLH(
+		dx::XMConvertToRadians(Fov), // FOV
+		(float) gfx.GetWidth() / (float)gfx.GetHeight(), // Aspect ratio
+		NearClipping, // near clipping
+		FarClipping) // far clipping)
+	);
 }
 
 Game::~Game()
