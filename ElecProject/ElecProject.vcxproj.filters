@@ -77,5 +77,6 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Src\PixelShader.hlsl" />
+    <FxCompile Include="Src\VertexShader.hlsl" />
   </ItemGroup>
 </Project>

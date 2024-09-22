@@ -1,7 +1,6 @@
 //
 // TODO:
 // 1) Refactor the const buffer to not suck
-// 2) refactor how the shaders are compiled to use hlsl files 
 // 3) 
 //
 //

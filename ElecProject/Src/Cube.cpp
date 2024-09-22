@@ -1,9 +1,9 @@
 #include "Cube.h"
 #include "Macros.h"
-#include <d3dcompiler.h>
 namespace shaders
 {
-	#include "PixelShader.shaderheader" // If there is an error, ignore it. File gets created on compilation
+#include "PixelShader.shaderheader" // If there is an error, ignore it. File gets created on compilation
+#include "VertexShader.shaderheader"
 }
 // Namespace definitions in the implementation file
 using namespace Microsoft::WRL;
@@ -78,40 +78,9 @@ void Cube::InitSharedResources(Graphics& gfx)
 {
 	HRESULT hr;
 
-	// Define and compile the vertex shader
-	const char* vsCode = 
-		"cbuffer MatrixBuffer : register(b0)"
-		"{"
-		"    matrix worldViewProj;"
-		"};"
-		"struct VS_INPUT {"
-		"    float3 pos : POSITION;"
-		"    float4 color : COLOR;"
-		"};"
-		"struct PS_INPUT {"
-		"    float4 pos : SV_POSITION;"
-		"    float4 color : COLOR;"
-		"};"
-		"PS_INPUT VSMain(VS_INPUT input) {"
-		"    PS_INPUT output;"
-		"    output.pos = mul(float4(input.pos, 1.0f), worldViewProj);"
-		"    output.color = input.color;"
-		"    return output;"
-		"}";
-	ComPtr<ID3DBlob> vsBlob;
-	ComPtr<ID3DBlob> errBlob;
-	if (FAILED(hr = D3DCompile(vsCode, strlen(vsCode), nullptr, nullptr, nullptr,
-		"VSMain", "vs_5_0", 0, 0, &vsBlob, &errBlob)))
-	{
-		if (errBlob.Get())
-		{
-			OutputDebugStringA((char*)errBlob->GetBufferPointer());
-		}
-		throw GFX_EXCEPT(hr);
-	}
 
-	THROW_FAILED_GFX(gfx.pGetDevice()->CreateVertexShader(vsBlob->GetBufferPointer(),
-		vsBlob->GetBufferSize(), nullptr, &s_pVertexShader));
+	THROW_FAILED_GFX(gfx.pGetDevice()->CreateVertexShader(shaders::VertexShaderBytecode,
+		sizeof(shaders::VertexShaderBytecode), nullptr, &s_pVertexShader));
 
 
 	// Pixel Shader
@@ -130,7 +99,7 @@ void Cube::InitSharedResources(Graphics& gfx)
 	};
 
 	THROW_FAILED_GFX(gfx.pGetDevice()->CreateInputLayout(layoutDesc, ARRAYSIZE(layoutDesc),
-		vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &s_pInputLayout));
+		shaders::VertexShaderBytecode, sizeof(shaders::VertexShaderBytecode), &s_pInputLayout));
 		
 	// Define the cube vertices
 	Vertex vertices[] =
