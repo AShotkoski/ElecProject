@@ -35,10 +35,10 @@ void Game::Go()
 
 void Game::UpdateLogic()
 {
-
+	cube.Update(dt);
 }
 
 void Game::DrawFrame()
 {
-	cube.Draw(gfx, dt);
+	cube.Draw(gfx);
 }

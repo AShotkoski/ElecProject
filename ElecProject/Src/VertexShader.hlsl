@@ -1,5 +1,6 @@
 cbuffer MatrixBuffer : register(b0)
 {
+    matrix world;
     matrix worldViewProj;
 };
 struct VS_INPUT

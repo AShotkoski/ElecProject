@@ -13,7 +13,8 @@ class Cube
 {
 public:
 	Cube(Graphics& gfx);
-	void Draw(Graphics& gfx, float dt);
+	void Update(float dt);
+	void Draw(Graphics& gfx);
 
 private:
 	// Instance specific resource
@@ -33,11 +34,11 @@ private:
 
 
 	// Const Buffer structure
-	struct ConstBuffer
+	struct ConstantBuffer
 	{
+		DirectX::XMMATRIX world;
 		DirectX::XMMATRIX worldViewProj;
-
-	};
+	} ConstBuffer;
 
 	// Vertex structure
 	struct Vertex

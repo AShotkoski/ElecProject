@@ -32,20 +32,25 @@ Cube::Cube(Graphics& gfx)
 	// I remembered they existed and they make the code less verbose)
 	D3D11_BUFFER_DESC cbDesc = CD3D11_BUFFER_DESC(sizeof(ConstBuffer),D3D11_BIND_CONSTANT_BUFFER);
 	THROW_FAILED_GFX(gfx.pGetDevice()->CreateBuffer(&cbDesc, nullptr, &pConstBuffer));
+	// Default the const buffer to identity matrices
+	ConstBuffer.worldViewProj = dx::XMMatrixIdentity();
+	ConstBuffer.world = dx::XMMatrixIdentity();
+	
 }
 
-void Cube::Draw(Graphics& gfx, float dt)
+void Cube::Update(float dt)
 {
-	
 	static float theta = dt;
-	dx::XMMATRIX world = dx::XMMatrixRotationRollPitchYaw(0, theta, 0.01f);
+	ConstBuffer.world = dx::XMMatrixRotationRollPitchYaw(0, theta, 0.01f);
 	theta += dt;
+}
 
-	// Build the constant buffer
-	ConstBuffer cb;
-	cb.worldViewProj = dx::XMMatrixTranspose(world * gfx.GetViewProjection());
+void Cube::Draw(Graphics& gfx)
+{
+
+	ConstBuffer.worldViewProj = dx::XMMatrixTranspose(ConstBuffer.world * gfx.GetViewProjection());
 	// Update the CB
-	gfx.pGetContext()->UpdateSubresource(pConstBuffer.Get(), 0, nullptr, &cb, 0, 0);
+	gfx.pGetContext()->UpdateSubresource(pConstBuffer.Get(), 0, nullptr, &ConstBuffer, 0, 0);
 
 	// Set everything
 
