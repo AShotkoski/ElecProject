@@ -41,6 +41,8 @@ public:
 	ID3D11DeviceContext* pGetContext() const;
 	ID3D11RenderTargetView* pGetRTV() const;
 	Camera& GetCamera();
+	// Returns the View Projection matrix as a row-major matrix
+	DirectX::XMMATRIX GetViewProjection() const;
 private:
 	DirectX::XMMATRIX projection;
 	Camera camera;

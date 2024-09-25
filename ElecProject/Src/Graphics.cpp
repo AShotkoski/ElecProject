@@ -194,6 +194,11 @@ Camera& Graphics::GetCamera()
 	return camera;
 }
 
+DirectX::XMMATRIX Graphics::GetViewProjection() const
+{
+	return camera.GetViewMatrix() * GetProjection();
+}
+
 // -------------------------------------------------------------------------------
 // ---------------------------GFX EXCEPTION---------------------------------------
 // -------------------------------------------------------------------------------

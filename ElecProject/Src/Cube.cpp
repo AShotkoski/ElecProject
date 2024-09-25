@@ -41,13 +41,10 @@ void Cube::Draw(Graphics& gfx, float dt)
 	dx::XMMATRIX world = dx::XMMatrixRotationRollPitchYaw(0, theta, 0.01f);
 	theta += dt;
 
-	dx::XMMATRIX worldviewproj = world * gfx.GetCamera().GetViewMatrix() * gfx.GetProjection();
-
-	worldviewproj = dx::XMMatrixTranspose(worldviewproj); // HLSL wants column major
-
+	// Build the constant buffer
 	ConstBuffer cb;
-	cb.worldViewProj = worldviewproj;
-
+	cb.worldViewProj = dx::XMMatrixTranspose(world * gfx.GetViewProjection());
+	// Update the CB
 	gfx.pGetContext()->UpdateSubresource(pConstBuffer.Get(), 0, nullptr, &cb, 0, 0);
 
 	// Set everything
