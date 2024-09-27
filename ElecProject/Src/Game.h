@@ -14,7 +14,8 @@ public:
 private:
 	void UpdateLogic();
 	void DrawFrame();
-
+	// Wraps the if's for controlling the camera
+	void ControlCamera();
 
 private:
 	Window wnd;
