@@ -12,9 +12,23 @@
 class Cube
 {
 public:
-	Cube(Graphics& gfx);
-	void Update(float dt);
+	Cube(Graphics& gfx,
+		DirectX::XMFLOAT3 pos = {0,0,0},
+		DirectX::XMFLOAT3 scale = {1,1,1},
+		DirectX::FXMVECTOR rotation = DirectX::XMQuaternionIdentity());
 	void Draw(Graphics& gfx);
+
+	void setPosition(DirectX::XMFLOAT3 newPos);
+	void setScaling(DirectX::XMFLOAT3 newScaling);
+	void setScaling(float factor); // wraps to above
+	void setRotation(DirectX::FXMVECTOR quaternion);
+
+private:
+	// Storing all these properties is pretty wasteful since we have a CB
+	// embedded in the class, but it shouldn't bottleneck anything 
+	DirectX::XMFLOAT3 position;
+	DirectX::XMFLOAT3 scaling; // (x factor, y factor, z factor)
+	DirectX::XMVECTOR rotation; // quaternion for rotation 
 
 private:
 	// Instance specific resource
@@ -32,6 +46,8 @@ private:
 	// Helper function to initialize all the shared resources
 	static void InitSharedResources(Graphics& gfx);
 
+	// Update the buffer based on internal cube params
+	void updateCB();
 
 	// Const Buffer structure
 	struct ConstantBuffer

@@ -22,6 +22,7 @@ private:
 	FrameTimer ft;
 
 	Cube cube;
+	Cube cube2;
 
 private:
 	float dt = 0;

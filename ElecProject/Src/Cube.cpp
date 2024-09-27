@@ -18,7 +18,11 @@ ComPtr<ID3D11Buffer> Cube::s_pIndexBuffer;
 bool Cube::s_sharedResourcesInitialized = false;
 
 
-Cube::Cube(Graphics& gfx)
+Cube::Cube(Graphics& gfx, dx::XMFLOAT3 pos, dx::XMFLOAT3 scale, dx::FXMVECTOR rotation)
+	:
+	position(pos),
+	scaling(scale),
+	rotation(rotation)
 {
 	HRESULT hr;
 	// Initialize the shared resources if they are not yet initialized 
@@ -35,15 +39,12 @@ Cube::Cube(Graphics& gfx)
 	// Default the const buffer to identity matrices
 	ConstBuffer.worldViewProj = dx::XMMatrixIdentity();
 	ConstBuffer.world = dx::XMMatrixIdentity();
+
+	// Update the constant buffer for the passed in params
+	updateCB();
 	
 }
 
-void Cube::Update(float dt)
-{
-	static float theta = dt;
-	ConstBuffer.world = dx::XMMatrixRotationRollPitchYaw(0, theta, 0.01f);
-	theta += dt;
-}
 
 void Cube::Draw(Graphics& gfx)
 {
@@ -66,6 +67,31 @@ void Cube::Draw(Graphics& gfx)
 
 	// Draw
 	gfx.pGetContext()->DrawIndexed(36, 0, 0);
+}
+
+
+void Cube::setPosition(DirectX::XMFLOAT3 newPos)
+{
+	position = newPos;
+	updateCB();
+}
+
+void Cube::setScaling(DirectX::XMFLOAT3 newScaling)
+{
+	scaling = newScaling;
+	updateCB();
+}
+
+void Cube::setScaling(float factor)
+{
+	scaling = dx::XMFLOAT3(factor, factor, factor);
+	updateCB();
+}
+
+void Cube::setRotation(DirectX::FXMVECTOR quaternion)
+{
+	rotation = quaternion;
+	updateCB();
 }
 
 void Cube::InitSharedResources(Graphics& gfx)
@@ -140,4 +166,11 @@ void Cube::InitSharedResources(Graphics& gfx)
 	ibData.pSysMem = indices;
 
 	THROW_FAILED_GFX(gfx.pGetDevice()->CreateBuffer(&ibDesc, &ibData, &s_pIndexBuffer));
+}
+
+void Cube::updateCB()
+{
+	ConstBuffer.world = dx::XMMatrixRotationQuaternion(rotation) *
+		dx::XMMatrixScaling(scaling.x, scaling.y, scaling.z) *
+		dx::XMMatrixTranslation(position.x, position.y, position.z);
 }
