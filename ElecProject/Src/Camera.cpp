@@ -72,6 +72,22 @@ void Camera::UpdateMovementSpeed(float factor)
 	MoveSpeed *= factor;
 }
 
+
+void Camera::EnableMouseControl()
+{
+	isMouseControl = true;
+}
+
+void Camera::DisableMouseControl()
+{
+	isMouseControl = false;
+}
+
+bool Camera::isMouseControlEnabled() const
+{
+	return isMouseControl;
+}
+
 void Camera::CalculateMatrices()
 {
 	// Rotate where we want to look

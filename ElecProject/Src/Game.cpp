@@ -37,10 +37,6 @@ void Game::Go()
 void Game::UpdateLogic()
 {
 	ControlCamera();
-	if (wnd.kbd.KeyIsPressed(VK_SPACE))
-		cube.setScaling(2.f);
-	if (wnd.kbd.KeyIsPressed(VK_SPACE))
-		cube2.setRotation(dx::XMQuaternionRotationRollPitchYaw(dt * 10.f, dt, 0));
 }
 
 void Game::DrawFrame()
@@ -52,6 +48,21 @@ void Game::DrawFrame()
 void Game::ControlCamera()
 {
 	DirectX::XMFLOAT3 dCampos = { 0, 0, 0 };
+
+	// Hold space to go into camera control mode
+	if (wnd.kbd.KeyIsPressed(VK_SPACE))
+	{
+		gfx.GetCamera().EnableMouseControl();
+		wnd.DisableCursor();
+	}
+	else
+	{
+		gfx.GetCamera().DisableMouseControl();
+		wnd.EnableCursor();
+		// Fast return and don't process keyboard input when not in mouse control mode,
+		// be honest you don't need to move the camera in view mode.
+		return;
+	}
 
 	if (wnd.kbd.KeyIsPressed('W'))
 	{

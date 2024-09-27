@@ -232,32 +232,38 @@ LRESULT Window::MessageProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 	switch ( msg )
 	{
 		// ---------Raw mouse input -----------
-		case WM_INPUT:
+	case WM_INPUT:
+	{
+		// Test if mouse control is enabled for current gfx camera
+		if (!pGfx->GetCamera().isMouseControlEnabled())
 		{
-
-			UINT dwSize = 0u;
-
-			// Get size of raw input and resize buffer to fit it
-			GetRawInputData( (HRAWINPUT)lParam, RID_INPUT, nullptr, &dwSize, sizeof(RAWINPUTHEADER) );
-			rawBuffer.resize( dwSize );
-			// Fill raw buffer with data
-			if ( GetRawInputData( (HRAWINPUT)lParam, RID_INPUT, rawBuffer.data(), &dwSize, sizeof(RAWINPUTHEADER))
-				 != dwSize )
-				throw WINDOW_LAST_ERROR_EXCEPT();
-			const RAWINPUT* pRaw = (RAWINPUT*)rawBuffer.data();
-
-			// Test if the raw data is mouse movement
-			if ( pRaw->header.dwType == RIM_TYPEMOUSE && 
-				 (pRaw->data.mouse.lLastX != 0 ||
-				 pRaw->data.mouse.lLastY != 0))
-			{
-				// Directly update the camera to get as little input lag as possible
-				
-
-				//SetCursorPos( Center_x, Center_y );
-			}
 			break;
 		}
+
+		UINT dwSize = 0u;
+
+		// Get size of raw input and resize buffer to fit it
+		GetRawInputData((HRAWINPUT)lParam, RID_INPUT, nullptr, &dwSize, sizeof(RAWINPUTHEADER));
+		rawBuffer.resize(dwSize);
+		// Fill raw buffer with data
+		if (GetRawInputData((HRAWINPUT)lParam, RID_INPUT, rawBuffer.data(), &dwSize, sizeof(RAWINPUTHEADER))
+			!= dwSize)
+			throw WINDOW_LAST_ERROR_EXCEPT();
+		const RAWINPUT* pRaw = (RAWINPUT*)rawBuffer.data();
+
+		// Test if the raw data is mouse movement
+		if (pRaw->header.dwType == RIM_TYPEMOUSE &&
+			(pRaw->data.mouse.lLastX != 0 ||
+				pRaw->data.mouse.lLastY != 0))
+		{
+			// Directly update the camera to get as little input lag as possible
+			pGfx->GetCamera().UpdateView({ (float)pRaw->data.mouse.lLastX,
+											(float)pRaw->data.mouse.lLastY });
+
+			SetCursorPos(Center_x, Center_y);
+		}
+		break;
+	}
 		// --------- Keyboard -----------
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:

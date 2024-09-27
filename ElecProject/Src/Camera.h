@@ -12,6 +12,9 @@ public:
 	void UpdatePosition(DirectX::XMFLOAT3 dPos, float dt);
 	DirectX::XMFLOAT3 GetPosition() const;
 	DirectX::XMFLOAT3 GetDirectionVector() const;
+	void EnableMouseControl();
+	void DisableMouseControl();
+	bool isMouseControlEnabled() const;
 	void UpdateMovementSpeed(float factor);
 private:
 	void CalculateMatrices();
@@ -19,6 +22,7 @@ private:
 	DirectX::XMMATRIX view = DirectX::XMMatrixIdentity();
 	DirectX::XMMATRIX invView = DirectX::XMMatrixIdentity();
 	DirectX::XMFLOAT3 Position;
+	bool isMouseControl = false;
 	float pitch;
 	float yaw;
 	static constexpr float Sensitivity = 17.f / 10000.f;
