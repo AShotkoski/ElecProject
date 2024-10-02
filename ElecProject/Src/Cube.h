@@ -13,6 +13,7 @@ class Cube
 {
 public:
 	Cube(Graphics& gfx,
+		float patternSeed = 0.f,
 		DirectX::XMFLOAT3 pos = {0,0,0},
 		DirectX::XMFLOAT3 scale = {1,1,1},
 		DirectX::FXMVECTOR rotation = DirectX::XMQuaternionIdentity());
@@ -46,7 +47,7 @@ private:
 	// Helper function to initialize all the shared resources
 	static void InitSharedResources(Graphics& gfx);
 
-	// Update the buffer based on internal cube params
+	// Update the const buffer based on internal cube params
 	void updateCB();
 
 	// Const Buffer structure
@@ -54,6 +55,7 @@ private:
 	{
 		DirectX::XMMATRIX world;
 		DirectX::XMMATRIX worldViewProj;
+		float perlinRNGSeed;
 	} ConstBuffer;
 
 	// Vertex structure

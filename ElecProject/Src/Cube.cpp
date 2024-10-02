@@ -18,7 +18,7 @@ ComPtr<ID3D11Buffer> Cube::s_pIndexBuffer;
 bool Cube::s_sharedResourcesInitialized = false;
 
 
-Cube::Cube(Graphics& gfx, dx::XMFLOAT3 pos, dx::XMFLOAT3 scale, dx::FXMVECTOR rotation)
+Cube::Cube(Graphics& gfx,float patternSeed, dx::XMFLOAT3 pos, dx::XMFLOAT3 scale, dx::FXMVECTOR rotation)
 	:
 	position(pos),
 	scaling(scale),
@@ -39,6 +39,8 @@ Cube::Cube(Graphics& gfx, dx::XMFLOAT3 pos, dx::XMFLOAT3 scale, dx::FXMVECTOR ro
 	// Default the const buffer to identity matrices
 	ConstBuffer.worldViewProj = dx::XMMatrixIdentity();
 	ConstBuffer.world = dx::XMMatrixIdentity();
+	// set the CB seed
+	ConstBuffer.perlinRNGSeed = patternSeed;
 
 	// Update the constant buffer for the passed in params
 	updateCB();

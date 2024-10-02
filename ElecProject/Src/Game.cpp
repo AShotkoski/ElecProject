@@ -8,8 +8,8 @@ using namespace Microsoft::WRL;
 Game::Game()
 	: wnd(ScreenWidth, ScreenHeight, WindowTitle)
 	, gfx(wnd.GFX())
-	, cube(gfx, dx::XMFLOAT3{2.f, 0, 1.f})
-	, cube2(gfx, {-2.f, 0, 0})
+	, cube(gfx,0, dx::XMFLOAT3{2.f, 0, 1.f})
+	, cube2(gfx,100, {-2.f, 0, 0})
 {
 	// Setup the projection matrix
 	gfx.SetProjection(dx::XMMatrixPerspectiveFovLH(

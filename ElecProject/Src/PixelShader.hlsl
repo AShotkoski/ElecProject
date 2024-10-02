@@ -1,69 +1,86 @@
-// Hash function to generate pseudo-random values
-float Hash(float3 p)
+
+#include "Header.hlsli"
+
+float GetElevation(float3 pos)
 {
-    p = frac(p * 0.3183099 + 0.1);
-    p *= 17.0;
-    return frac(p.x * p.y * p.z * (p.x + p.y + p.z));
+     float elevation = 0.0f;
+
+    // Base noise for primary terrain
+    elevation += snoise(pos * 0.45f) * 0.65f;
+
+    // Medium freq for hills
+    elevation += snoise(pos * 1.5f) * 0.35f;
+    // High freq for mountains
+    elevation += snoise(pos * 4.0f) * 0.11f;
+    // ultra high freq for peaks
+    elevation += snoise(pos * 16.0f) * 0.01f;
+    
+    // Bias everything upwards
+    //elevation = pow(elevation, 0.5f);
+
+    // Normalize elevation
+    elevation = clamp(elevation, 0.0f, 1.0f);
+
+    return elevation;
 }
 
-// Noise function using trilinear interpolation
-float Noise(float3 p)
+float3 GetColor(float elevation, float seed)
 {
-    float3 i = floor(p);
-    float3 f = frac(p);
+     // Base colors
+    float3 deepWaterColor = float3(0.0f, 0.0f, 0.4f);  // Deep Blue
+    float3 shallowWaterColor = float3(0.0f, 0.0f, 0.6f); // Lighter Blue
+    float3 landColor = float3(0.1f, 0.7f, 0.1f);      // Green
+    float3 mountainColor = float3(0.5f, 0.5f, 0.5f); // Gray
+    float3 snowColor = float3(1.0f, 1.0f, 1.0f);      // White
 
-    // Hash the corners of the cube
-    float n000 = Hash(i + float3(0, 0, 0));
-    float n001 = Hash(i + float3(0, 0, 1));
-    float n010 = Hash(i + float3(0, 1, 0));
-    float n011 = Hash(i + float3(0, 1, 1));
-    float n100 = Hash(i + float3(1, 0, 0));
-    float n101 = Hash(i + float3(1, 0, 1));
-    float n110 = Hash(i + float3(1, 1, 0));
-    float n111 = Hash(i + float3(1, 1, 1));
+    float3 color;
 
-    // Smooth interpolation
-    float3 u = f * f * (3.0 - 2.0 * f);
-
-    // Interpolate along x, y, then z
-    return lerp(
-        lerp(
-            lerp(n000, n100, u.x),
-            lerp(n010, n110, u.x), u.y),
-        lerp(
-            lerp(n001, n101, u.x),
-            lerp(n011, n111, u.x), u.y),
-        u.z);
-}
-
-// Fractal noise function to sum multiple octaves
-float FractalNoise(float3 p)
-{
-    float total = 0.0;
-    float frequency = 1.0;
-    float amplitude = 1.0;
-    float maxAmplitude = 0.0;
-
-    // Loop through octaves
-    for (int i = 0; i < 5; ++i)
+    if (elevation < 0.25f)
     {
-        total += Noise(p * frequency) * amplitude;
-        maxAmplitude += amplitude;
-        amplitude *= 0.5;
-        frequency *= 2.0;
+        // Water
+        float waterFactor = elevation / 0.25f;
+        color = lerp(deepWaterColor, shallowWaterColor, waterFactor);
     }
-    return total / maxAmplitude; // Normalize the result
+    else if (elevation < 0.55f)
+    {
+        // Land
+        float landFactor = (elevation - 0.25f) / (0.55f - 0.25f);
+        color = lerp(landColor, mountainColor, landFactor);
+    }
+    else
+    {
+        // Mountains to snow caps
+        float mountainFactor = (elevation - 0.55f) / (1.0f - 0.55f);
+        color = lerp(mountainColor, snowColor, mountainFactor);
+    }
+
+    // Optional: Slight color variation based on seed for uniqueness
+    float colorVariation = frac(sin(seed) * 10000.0f) * 0.05f; // Small variation factor
+    color += colorVariation;
+
+    return saturate(color); // Ensure color stays within [0,1]
 }
+
 
 
 struct PS_INPUT
 {
- float4 pos : SV_POSITION;
- float3 WorldPos : TEXCOORD0;
+ float4 pos        : SV_POSITION;
+ float3 WorldPos   : TEXCOORD0;
+ float  perlinSeed : TEXCOORD1;
 };
 
 float4 PS_Main(PS_INPUT input) : SV_TARGET
 {
-	float noiseVal = FractalNoise(input.WorldPos * 10);
-	return float4(noiseVal, noiseVal, noiseVal, 1.0);
+	//float noiseVal = curl(input.WorldPos.xyz * 2);
+    //float3 color = lerp(float3(0,0,1), float3(1,1,1), noiseVal);
+    //float noise = snoise(input.WorldPos);
+    float seed = input.perlinSeed + 1.0;
+    float3 seedOffset = float3(seed * 15.f, seed * 3.14159f, seed * 32.345235235f);
+
+    float elevation = GetElevation(input.WorldPos + seedOffset);
+    float3 color = GetColor(elevation, seed);
+	//return float4(float3(elevation, elevation, elevation), 1.0);
+	return float4(color, 1.0);
+ 
 }

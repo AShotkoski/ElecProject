@@ -85,4 +85,7 @@
     <FxCompile Include="Src\PixelShader.hlsl" />
     <FxCompile Include="Src\VertexShader.hlsl" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Src\Header.hlsli" />
+  </ItemGroup>
 </Project>
