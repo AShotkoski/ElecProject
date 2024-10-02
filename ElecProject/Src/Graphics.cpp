@@ -15,7 +15,7 @@ Graphics::Graphics(HWND hWnd)
 	:
 	projection(DirectX::XMMatrixIdentity())
 {
-	// Used for erro chedcking
+	// Used for erro checking
 	HRESULT hr;
 
 	// Get window dimensions
@@ -50,26 +50,36 @@ Graphics::Graphics(HWND hWnd)
 	flags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
+	// Hold the created feature level
+	D3D_FEATURE_LEVEL featureLevel;
+
 	// Create d3d device and swap chain
+	// Since feature levels array is blank, it uses default ordering
 	THROW_FAILED_GFX(D3D11CreateDeviceAndSwapChain(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
 		flags,
-		nullptr,
-		0,
+		nullptr, // Feature level ptr
+		0, // num elements in featuer level ptr
 		D3D11_SDK_VERSION,
 		&sd,
 		&pSwapChain,
 		&pDevice,
-		nullptr,
+		&featureLevel, // Out, feature level
 		&pContext));
 
-	// Get back buffer tex
+	// Ensure the required feature level is met for shader model 5.0
+	if (featureLevel < D3D_FEATURE_LEVEL_11_0)
+	{
+		throw std::runtime_error("The feature level of your graphics card does not meet the"
+			" minimum specs for this program.");
+	}
+
+
+	// Get back buffer texture
 	WRL::ComPtr<ID3D11Texture2D> pBackBuffer;
 	THROW_FAILED_GFX(pSwapChain->GetBuffer(0u, __uuidof(ID3D11Texture2D), &pBackBuffer));
-
-	// Create render target view
 
 
 	// Create the render target view

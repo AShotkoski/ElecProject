@@ -113,9 +113,7 @@ void Cube::InitSharedResources(Graphics& gfx)
 	D3D11_INPUT_ELEMENT_DESC layoutDesc[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
-		  0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,
-		  D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		  0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	THROW_FAILED_GFX(gfx.pGetDevice()->CreateInputLayout(layoutDesc, ARRAYSIZE(layoutDesc),
@@ -125,15 +123,15 @@ void Cube::InitSharedResources(Graphics& gfx)
 	Vertex vertices[] =
 	{
 		// Front face
-		{ { -1.0f, -1.0f, -1.0f }, {1, 0, 0, 1} },
-		{ { -1.0f,  1.0f, -1.0f }, {0, 1, 0, 1} },
-		{ {  1.0f,  1.0f, -1.0f }, {0, 0, 1, 1} },
-		{ {  1.0f, -1.0f, -1.0f }, {1, 1, 1, 1} },
+		{ { -1.0f, -1.0f, -1.0f } },
+		{ { -1.0f,  1.0f, -1.0f }, },
+		{ {  1.0f,  1.0f, -1.0f } },
+		{ {  1.0f, -1.0f, -1.0f } },
 		// Back face
-		{ { -1.0f, -1.0f,  1.0f }, {1, 1, 0, 1} },
-		{ { -1.0f,  1.0f,  1.0f }, {0, 1, 1, 1} },
-		{ {  1.0f,  1.0f,  1.0f }, {1, 0, 1, 1} },
-		{ {  1.0f, -1.0f,  1.0f }, {0.5f, 0.5f, 0.5f, 1} },
+		{ { -1.0f, -1.0f,  1.0f } },
+		{ { -1.0f,  1.0f,  1.0f } },
+		{ {  1.0f,  1.0f,  1.0f } },
+		{ {  1.0f, -1.0f,  1.0f } },
 	};
 
 	D3D11_BUFFER_DESC vbDesc = CD3D11_BUFFER_DESC(sizeof(vertices),D3D11_BIND_VERTEX_BUFFER);
