@@ -6,8 +6,8 @@ float GetElevation(float3 pos)
      float elevation = 0.0f;
 
     // Base noise for primary terrain
-    elevation += snoise(pos * 0.45f) * 0.65f;
-
+    elevation += snoise(pos * 0.4f) * 0.65f;
+    
     // Medium freq for hills
     elevation += snoise(pos * 1.5f) * 0.35f;
     // High freq for mountains
@@ -15,8 +15,10 @@ float GetElevation(float3 pos)
     // ultra high freq for peaks
     elevation += snoise(pos * 16.0f) * 0.01f;
     
-    // Bias everything upwards
-    //elevation = pow(elevation, 0.5f);
+    // If all noise funcs return -1 the lowest elevation is -1.12
+    elevation += 1.12f; 
+    // Normalize the elevation 
+    elevation /= 2.24f;
 
     // Normalize elevation
     elevation = clamp(elevation, 0.0f, 1.0f);
@@ -33,24 +35,29 @@ float3 GetColor(float elevation, float seed)
     float3 mountainColor = float3(0.5f, 0.5f, 0.5f); // Gray
     float3 snowColor = float3(1.0f, 1.0f, 1.0f);      // White
 
+    // Lots of variables
+    float waterlevel = 0.42f;
+    float mountainlevel = 0.65f;
+
+
     float3 color;
 
-    if (elevation < 0.25f)
+    if (elevation < waterlevel)
     {
         // Water
-        float waterFactor = elevation / 0.25f;
+        float waterFactor = elevation / waterlevel;
         color = lerp(deepWaterColor, shallowWaterColor, waterFactor);
     }
-    else if (elevation < 0.55f)
+    else if (elevation < mountainlevel)
     {
         // Land
-        float landFactor = (elevation - 0.25f) / (0.55f - 0.25f);
+        float landFactor = (elevation - waterlevel) / (mountainlevel - waterlevel);
         color = lerp(landColor, mountainColor, landFactor);
     }
     else
     {
         // Mountains to snow caps
-        float mountainFactor = (elevation - 0.55f) / (1.0f - 0.55f);
+        float mountainFactor = (elevation - mountainlevel) / (1.0f - mountainlevel);
         color = lerp(mountainColor, snowColor, mountainFactor);
     }
 
@@ -82,5 +89,6 @@ float4 PS_Main(PS_INPUT input) : SV_TARGET
     float3 color = GetColor(elevation, seed);
 	//return float4(float3(elevation, elevation, elevation), 1.0);
 	return float4(color, 1.0);
+
  
 }
