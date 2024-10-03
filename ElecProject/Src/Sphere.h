@@ -2,13 +2,13 @@
 #pragma once
 #include "Graphics.h"
 
-class Cube
+class Sphere
 {
 public:
-	Cube(Graphics& gfx,
+	Sphere(Graphics& gfx,
 		float patternSeed = 0.f,
-		DirectX::XMFLOAT3 pos = {0,0,0},
-		DirectX::XMFLOAT3 scale = {1,1,1},
+		DirectX::XMFLOAT3 pos = { 0,0,0 },
+		DirectX::XMFLOAT3 scale = { 1,1,1 },
 		DirectX::FXMVECTOR rotation = DirectX::XMQuaternionIdentity());
 	void Draw(Graphics& gfx);
 

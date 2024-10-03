@@ -2,6 +2,7 @@
 #include "Window.h"
 #include "FrameTimer.h"
 #include "Cube.h"
+#include "Sphere.h"
 
 class Game
 {
@@ -24,6 +25,7 @@ private:
 
 	Cube cube;
 	Cube cube2;
+	Sphere planet;
 
 private:
 	float dt = 0;
