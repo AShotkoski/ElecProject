@@ -144,7 +144,7 @@ void Cube::InitSharedResources(Graphics& gfx)
 	THROW_FAILED_GFX(gfx.pGetDevice()->CreateBuffer(&vbDesc, &vbSrd, &s_pVertexBuffer));
 
 	// Create the index buffer
-	WORD indices[] =
+	unsigned short indices[] =
 	{
 		// Front face
 		0,1,2, 0,2,3,

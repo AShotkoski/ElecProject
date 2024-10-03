@@ -10,7 +10,7 @@ Game::Game()
 	, gfx(wnd.GFX())
 	, cube(gfx,0, dx::XMFLOAT3{2.f, 0, 1.f})
 	, cube2(gfx,100, {-2.f, 0, 0})
-	, planet(gfx, 0, {10.f, 10.f, 0.f}, {10,10,10})
+	, planet(gfx, 0)
 {
 	// Setup the projection matrix
 	gfx.SetProjection(dx::XMMatrixPerspectiveFovLH(
