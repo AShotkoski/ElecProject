@@ -125,7 +125,9 @@ UINT Sphere::InitSharedResources(Graphics& gfx)
 	// Generate the cube verts and inds to make those buffers
 	std::vector<Vertex> vertBuffer;
 	std::vector<unsigned short> indBuffer;
-	GenerateGeometry(1, vertBuffer, indBuffer);
+	// The number of triangles in the mesh is given by 
+	// T = 20*4^n where n is the subdivisions. Keep this in mind
+	GenerateGeometry(3, vertBuffer, indBuffer);
 
 	D3D11_BUFFER_DESC vbDesc = CD3D11_BUFFER_DESC((UINT)vertBuffer.size() * sizeof(Vertex), D3D11_BIND_VERTEX_BUFFER);
 
