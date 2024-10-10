@@ -18,7 +18,7 @@ Game::Game()
 	);
 
 	// Add planets
-	pPlanets.emplace_back(std::make_unique<Sphere>(gfx, 0.f, dx::XMFLOAT3{ 0,0,20 }, dx::XMFLOAT3{2,2,2}));
+	pPlanets.emplace_back(std::make_unique<Sphere>(gfx, 0.f, dx::XMFLOAT3{ 0,0,20 }, dx::XMFLOAT3{10,10,10}));
 }
 
 Game::~Game()
@@ -42,8 +42,6 @@ void Game::UpdateLogic()
 
 void Game::DrawFrame()
 {
-	cube.Draw(gfx);
-	cube2.Draw(gfx);
 	// Draw each planet
 	for (auto& p : pPlanets)
 	{

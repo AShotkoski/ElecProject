@@ -3,22 +3,37 @@
 
 float GetElevation(float3 pos)
 {
-     float elevation = 0.0f;
+    // Parameters for noise generations
+    // For noise, higher is more noisy
+    // For scale, constitutes the max elevation from this step
+    const float first_noise = 0.1f;
+    const float first_scale = 25.f;
+    const float second_noise = 0.175f;
+    const float second_scale = 15.f;
+    const float third_noise = 0.6f;
+    const float third_scale = 5.f;
+    const float fourth_noise = 4.0f;
+    const float fourth_scale = 0.5f;
+    const float elevation_max = first_scale + second_scale + third_scale + fourth_scale;
+    
 
+     float elevation = 0.0f;
+    
     // Base noise for primary terrain
-    elevation += snoise(pos * 0.4f) * 0.65f;
+    elevation += snoise(pos * first_noise) * first_scale;
     
     // Medium freq for hills
-    elevation += snoise(pos * 1.5f) * 0.35f;
+    elevation += snoise(pos * second_noise) * second_scale;
     // High freq for mountains
-    elevation += snoise(pos * 4.0f) * 0.11f;
+    elevation += snoise(pos * third_noise) * third_scale;
     // ultra high freq for peaks
-    elevation += snoise(pos * 16.0f) * 0.01f;
+    elevation += snoise(pos * fourth_noise) * fourth_scale;
     
-    // If all noise funcs return -1 the lowest elevation is -1.12
-    elevation += 1.12f; 
+    // If all noise funcs return -1 the lowest elevation is elevation_max
+    // this this makes all the values pos
+    elevation += elevation_max;
     // Normalize the elevation 
-    elevation /= 2.24f;
+    elevation /= (2.f * elevation_max);
 
     // Normalize elevation
     elevation = clamp(elevation, 0.0f, 1.0f);
@@ -26,18 +41,25 @@ float GetElevation(float3 pos)
     return elevation;
 }
 
+
+float3 interpolation(float3 a, float3 b, float x)
+{
+    float amount = pow(x,3);
+    return lerp(a,b,amount);
+}
+
 float3 GetColor(float elevation, float seed)
 {
      // Base colors
-    float3 deepWaterColor = float3(0.0f, 0.0f, 0.4f);  // Deep Blue
-    float3 shallowWaterColor = float3(0.0f, 0.0f, 0.6f); // Lighter Blue
-    float3 landColor = float3(0.1f, 0.7f, 0.1f);      // Green
-    float3 mountainColor = float3(0.5f, 0.5f, 0.5f); // Gray
-    float3 snowColor = float3(1.0f, 1.0f, 1.0f);      // White
+    const float3 deepWaterColor = float3(0.0f, 0.0f, 0.25f);  // Deep Blue
+    const float3 shallowWaterColor = float3(0.0f, 0.0f, 0.6f); // Lighter Blue
+    const float3 landColor = float3(0.1f, 0.7f, 0.1f);      // Green
+    const float3 mountainColor = float3(0.5f, 0.5f, 0.5f); // Gray
+    const float3 snowColor = float3(1.0f, 1.0f, 1.0f);      // White
 
     // Lots of variables
-    float waterlevel = 0.42f;
-    float mountainlevel = 0.65f;
+    const float waterlevel = 0.5f;
+    const float mountainlevel = 0.75f;
 
 
     float3 color;
@@ -46,7 +68,7 @@ float3 GetColor(float elevation, float seed)
     {
         // Water
         float waterFactor = elevation / waterlevel;
-        color = lerp(deepWaterColor, shallowWaterColor, waterFactor);
+        color = interpolation(deepWaterColor, shallowWaterColor, waterFactor);
     }
     else if (elevation < mountainlevel)
     {
@@ -58,7 +80,7 @@ float3 GetColor(float elevation, float seed)
     {
         // Mountains to snow caps
         float mountainFactor = (elevation - mountainlevel) / (1.0f - mountainlevel);
-        color = lerp(mountainColor, snowColor, mountainFactor);
+        color = interpolation(mountainColor, snowColor, mountainFactor);
     }
 
     // Optional: Slight color variation based on seed for uniqueness
