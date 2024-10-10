@@ -125,7 +125,9 @@ UINT Sphere::InitSharedResources(Graphics& gfx)
 	// Generate the cube verts and inds to make those buffers
 	std::vector<Vertex> vertBuffer;
 	std::vector<unsigned short> indBuffer;
-	GenerateGeometry(1, vertBuffer, indBuffer);
+	// The number of triangles in the mesh is given by 
+	// T = 20*4^n where n is the subdivisions. Keep this in mind
+	GenerateGeometry(3, vertBuffer, indBuffer);
 
 	D3D11_BUFFER_DESC vbDesc = CD3D11_BUFFER_DESC((UINT)vertBuffer.size() * sizeof(Vertex), D3D11_BIND_VERTEX_BUFFER);
 
@@ -142,7 +144,7 @@ UINT Sphere::InitSharedResources(Graphics& gfx)
 
 	THROW_FAILED_GFX(gfx.pGetDevice()->CreateBuffer(&ibDesc, &ibData, &s_pIndexBuffer));
 
-	return indBuffer.size();
+	return (UINT)indBuffer.size();
 }
 
 void Sphere::updateCB()
@@ -158,31 +160,35 @@ void Sphere::GenerateGeometry(size_t subdivisions, std::vector<Vertex>& out_vert
 	out_indices.clear();
 
 	// Initial icosahedron vertices
-	constexpr float t = 1.61803398875f; // (1 + sqrt(5)) / 2, the golden ratio
+	constexpr float phi = 1.61803398875f; // (1 + sqrt(5)) / 2, the golden ratio
 
 	// Add initial vertices (normalized to the unit sphere)
-	std::vector<DirectX::XMFLOAT3> initial_positions = {
-		{-1.0f,  t,  0.0f}, { 1.0f,  t,  0.0f}, {-1.0f, -t,  0.0f}, { 1.0f, -t,  0.0f},
-		{ 0.0f, -1.0f,  t}, { 0.0f,  1.0f,  t}, { 0.0f, -1.0f, -t}, { 0.0f,  1.0f, -t},
-		{ t,  0.0f, -1.0f}, { t,  0.0f,  1.0f}, {-t,  0.0f, -1.0f}, {-t,  0.0f,  1.0f}
+	std::vector<DirectX::XMFLOAT3> initial_positions = 
+	{
+		{-1.0f,  phi,  0.0f}, { 1.0f,  phi,  0.0f}, {-1.0f, -phi,  0.0f}, { 1.0f, -phi,  0.0f},
+		{ 0.0f, -1.0f,  phi}, { 0.0f,  1.0f,  phi}, { 0.0f, -1.0f, -phi}, { 0.0f,  1.0f, -phi},
+		{ phi,  0.0f, -1.0f}, { phi,  0.0f,  1.0f}, {-phi,  0.0f, -1.0f}, {-phi,  0.0f,  1.0f}
 	};
 
-	auto Normalize = [](DirectX::XMFLOAT3& v) {
+	auto Normalize = [](DirectX::XMFLOAT3& v) 
+		{
 		float length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 		v.x /= length;
 		v.y /= length;
 		v.z /= length;
 		};
 
-	for (auto& pos : initial_positions) {
+	for (auto& pos : initial_positions) 
+	{
 		Normalize(pos);
 		Vertex v;
 		v.position = pos;
 		out_vertices.emplace_back(v);
 	}
 
-	// Initial icosahedron indices (clockwise winding order for Direct3D11)
-	out_indices = {
+	// Initial icosahedron indices (clockwise winding order)
+	out_indices = 
+	{
 		0, 11, 5,   0, 5, 1,    0, 1, 7,    0, 7, 10,   0, 10, 11,
 		1, 5, 9,    5, 11, 4,   11, 10, 2,  10, 7, 6,   7, 1, 8,
 		3, 9, 4,    3, 4, 2,    3, 2, 6,    3, 6, 8,    3, 8, 9,
@@ -190,11 +196,14 @@ void Sphere::GenerateGeometry(size_t subdivisions, std::vector<Vertex>& out_vert
 	};
 
 	// Subdivision function
-	auto GetEdgeKey = [](unsigned short a, unsigned short b) {
+	auto GetEdgeKey = [](unsigned short a, unsigned short b) 
+		{
 		return ((uint64_t)std::min(a, b) << 32) | std::max(a, b);
 		};
 
-	auto GetMidpoint = [&](unsigned short a, unsigned short b, std::unordered_map<uint64_t, unsigned short>& cache) {
+	// Lambda for getting the midpoints
+	auto GetMidpoint = [&](unsigned short a, unsigned short b, std::unordered_map<uint64_t, unsigned short>& cache) 
+		{
 		uint64_t key = GetEdgeKey(a, b);
 		auto it = cache.find(key);
 		if (it != cache.end()) {
@@ -222,11 +231,13 @@ void Sphere::GenerateGeometry(size_t subdivisions, std::vector<Vertex>& out_vert
 		};
 
 	// Subdivide triangles
-	for (size_t i = 0; i < subdivisions; ++i) {
+	for (size_t i = 0; i < subdivisions; ++i) 
+	{
 		std::unordered_map<uint64_t, unsigned short> midpoints_cache;
 		std::vector<unsigned short> new_indices;
 
-		for (size_t j = 0; j < out_indices.size(); j += 3) {
+		for (size_t j = 0; j < out_indices.size(); j += 3) 
+		{
 			unsigned short a = out_indices[j];
 			unsigned short b = out_indices[j + 1];
 			unsigned short c = out_indices[j + 2];
@@ -243,6 +254,7 @@ void Sphere::GenerateGeometry(size_t subdivisions, std::vector<Vertex>& out_vert
 			new_indices.insert(new_indices.end(), { ab, bc, ca });
 		}
 
+		
 		out_indices = std::move(new_indices);
 	}
 

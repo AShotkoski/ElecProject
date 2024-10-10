@@ -9,8 +9,8 @@ Game::Game()
 	: wnd(ScreenWidth, ScreenHeight, WindowTitle)
 	, gfx(wnd.GFX())
 	, cube(gfx,0, dx::XMFLOAT3{2.f, 0, 1.f})
-	, cube2(gfx,100, {-2.f, 0, 0})
-	, planet(gfx, 0)
+	, cube2(gfx, 100, {-2.f, 0, 0})
+	, planet(gfx, 0, { 0,0,0 }, {10,10,10})
 {
 	// Setup the projection matrix
 	gfx.SetProjection(dx::XMMatrixPerspectiveFovLH(
