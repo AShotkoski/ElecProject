@@ -8,9 +8,6 @@ using namespace Microsoft::WRL;
 Game::Game()
 	: wnd(ScreenWidth, ScreenHeight, WindowTitle)
 	, gfx(wnd.GFX())
-	, cube(gfx,0, dx::XMFLOAT3{2.f, 0, 1.f})
-	, cube2(gfx, 100, {-2.f, 0, 0})
-	, planet(gfx, 0, { 0,0,0 }, {10,10,10})
 {
 	// Setup the projection matrix
 	gfx.SetProjection(dx::XMMatrixPerspectiveFovLH(
@@ -19,6 +16,9 @@ Game::Game()
 		NearClipping, // near clipping
 		FarClipping) // far clipping)
 	);
+
+	// Add planets
+	pPlanets.emplace_back(std::make_unique<Sphere>(gfx, 0.f, dx::XMFLOAT3{ 0,0,20 }, dx::XMFLOAT3{2,2,2}));
 }
 
 Game::~Game()
@@ -44,7 +44,11 @@ void Game::DrawFrame()
 {
 	cube.Draw(gfx);
 	cube2.Draw(gfx);
-	planet.Draw(gfx);
+	// Draw each planet
+	for (auto& p : pPlanets)
+	{
+		p->Draw(gfx);
+	}
 }
 
 void Game::ControlCamera()

@@ -181,7 +181,7 @@ void Sphere::GenerateGeometry(size_t subdivisions, std::vector<Vertex>& out_vert
 	for (auto& pos : initial_positions) 
 	{
 		Normalize(pos);
-		Vertex v;
+		Vertex v = {};
 		v.position = pos;
 		out_vertices.emplace_back(v);
 	}
@@ -221,7 +221,7 @@ void Sphere::GenerateGeometry(size_t subdivisions, std::vector<Vertex>& out_vert
 		Normalize(mid_pos);
 
 		// Compute normal and texture coordinates
-		Vertex v;
+		Vertex v = {};
 		v.position = mid_pos;
 
 		out_vertices.push_back(v);

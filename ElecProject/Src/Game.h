@@ -1,7 +1,6 @@
 #pragma once
 #include "Window.h"
 #include "FrameTimer.h"
-#include "Cube.h"
 #include "Sphere.h"
 
 class Game
@@ -22,10 +21,7 @@ private:
 	Window wnd;
 	Graphics& gfx;
 	FrameTimer ft;
-
-	Cube cube;
-	Cube cube2;
-	Sphere planet;
+	std::vector<std::unique_ptr<Sphere>> pPlanets;
 
 private:
 	float dt = 0;
