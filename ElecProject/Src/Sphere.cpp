@@ -99,6 +99,11 @@ void Sphere::setRotation(DirectX::FXMVECTOR quaternion)
 	updateCB();
 }
 
+DirectX::XMFLOAT3 Sphere::GetPos() const
+{
+	return position;
+}
+
 UINT Sphere::InitSharedResources(Graphics& gfx)
 {
 	HRESULT hr;

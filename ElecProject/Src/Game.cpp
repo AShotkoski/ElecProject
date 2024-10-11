@@ -18,7 +18,8 @@ Game::Game()
 	);
 
 	// Add planets
-	pPlanets.emplace_back(std::make_unique<Sphere>(gfx, 0.f, dx::XMFLOAT3{ 0,0,20 }, dx::XMFLOAT3{10,10,10}));
+	pPlanets.emplace_back(std::make_unique<Sphere>(gfx, 0.f, dx::XMFLOAT3{ 0,0,38 }, dx::XMFLOAT3{10,10,10}));
+	pPlanets.emplace_back(std::make_unique<Sphere>(gfx, 0.5f, dx::XMFLOAT3{ -20,0,10 }, dx::XMFLOAT3{8,8,8}));
 }
 
 Game::~Game()

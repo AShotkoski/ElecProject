@@ -17,7 +17,7 @@ public:
 	void setScaling(DirectX::XMFLOAT3 newScaling);
 	void setScaling(float factor); // wraps to above
 	void setRotation(DirectX::FXMVECTOR quaternion);
-	
+	DirectX::XMFLOAT3 GetPos() const;
 
 private:
 	// Const Buffer structure
