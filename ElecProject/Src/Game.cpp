@@ -39,6 +39,8 @@ void Game::Go()
 void Game::UpdateLogic()
 {
 	ControlCamera();
+	if(wnd.kbd.KeyIsPressed('L'))
+		testPhys();
 }
 
 void Game::DrawFrame()
@@ -114,4 +116,59 @@ void Game::ControlCamera()
 
 		gfx.GetCamera().UpdatePosition(dCampos, dt);
 	}
+}
+
+void Game::testPhys()
+{
+	// Velocity of planet at idx 0 (assuming velocity is stored and updated per object)
+	static dx::XMFLOAT3 v0 = { -5.0f, 15.0f, 20.0f }; 
+
+	// Gravitational constant (times masses, assuming it's scaled)
+	constexpr float G = 190000.0f;
+
+	// Get the positions of the planets
+	dx::XMFLOAT3 p0 = pPlanets[0]->GetPos();
+	dx::XMFLOAT3 p1 = pPlanets[1]->GetPos();
+
+	// Load XMFLOAT3 into XMVECTORs
+	dx::XMVECTOR vp0 = dx::XMLoadFloat3(&p0);
+	dx::XMVECTOR vp1 = dx::XMLoadFloat3(&p1);
+
+	// Calculate the vector between the two planets
+	dx::XMVECTOR r01 = dx::XMVectorSubtract(vp1, vp0);
+
+	// Calculate the squared distance between planets
+	dx::XMVECTOR distsqVec = dx::XMVector3LengthSq(r01);
+	float distsq;
+	dx::XMStoreFloat(&distsq, distsqVec);
+
+	if (distsq == 0.0f) {
+		// Prevent division by zero if the planets are at the same position
+		return;
+	}
+
+	// Calculate the unit vector (normalized direction) from p0 to p1
+	dx::XMVECTOR r01hat = dx::XMVector3Normalize(r01);
+
+	// Calculate the gravitational force magnitude
+	dx::XMVECTOR vf0 = dx::XMVectorScale(r01hat, G / distsq);
+
+	dx::XMVECTOR vDt = dx::XMVectorReplicate(dt);
+
+	// Adjust force for time step
+	vf0 = dx::XMVectorMultiply(vf0, vDt);
+
+	// Update the velocity (assuming acceleration affects velocity)
+	dx::XMVECTOR vVelocity0 = dx::XMLoadFloat3(&v0);
+	vVelocity0 = dx::XMVectorAdd(vVelocity0, vf0);
+	dx::XMStoreFloat3(&v0, vVelocity0);
+
+	// Update the position using the new velocity
+	vp0 = dx::XMVectorMultiplyAdd(vVelocity0, vDt, vp0);
+
+	// Store the updated position
+	dx::XMStoreFloat3(&p0, vp0);
+	pPlanets[0]->setPosition(p0);
+
+	
 }

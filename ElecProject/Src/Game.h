@@ -17,6 +17,8 @@ private:
 	// Wraps the if's for controlling the camera
 	void ControlCamera();
 
+	void testPhys();
+
 private:
 	Window wnd;
 	Graphics& gfx;
@@ -30,7 +32,7 @@ private:
 	static constexpr UINT ScreenHeight = 954u;
 	static constexpr const wchar_t* WindowTitle = L"Rendering engine";
 	static constexpr float NearClipping = 0.1f;
-	static constexpr float FarClipping = 130.0f;
+	static constexpr float FarClipping = 1300.0f;
 	static constexpr float Fov = 70.f; // degrees
 };
 
