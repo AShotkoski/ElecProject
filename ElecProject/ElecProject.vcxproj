@@ -151,6 +151,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Planet.cpp" />
     <ClCompile Include="Src\Sphere.cpp" />
     <ClCompile Include="Src\BaseException.cpp" />
     <ClCompile Include="Src\Camera.cpp" />
@@ -164,6 +165,7 @@
     <ClCompile Include="Src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Planet.h" />
     <ClInclude Include="Src\Sphere.h" />
     <ClInclude Include="Src\Camera.h" />
     <ClInclude Include="Src\Cube.h" />

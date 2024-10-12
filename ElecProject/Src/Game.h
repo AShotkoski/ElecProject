@@ -1,7 +1,7 @@
 #pragma once
 #include "Window.h"
 #include "FrameTimer.h"
-#include "Sphere.h"
+#include "Planet.h"
 
 class Game
 {
@@ -23,7 +23,7 @@ private:
 	Window wnd;
 	Graphics& gfx;
 	FrameTimer ft;
-	std::vector<std::unique_ptr<Sphere>> pPlanets;
+	std::vector<std::unique_ptr<Planet>> pPlanets;
 
 private:
 	float dt = 0;
