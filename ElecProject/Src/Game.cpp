@@ -120,55 +120,86 @@ void Game::ControlCamera()
 
 void Game::testPhys()
 {
-	// Velocity of planet at idx 0 (assuming velocity is stored and updated per object)
-	static dx::XMFLOAT3 v0 = { -5.0f, 15.0f, 20.0f }; 
+	auto& planet = pPlanets[0];
 
-	// Gravitational constant (times masses, assuming it's scaled)
-	constexpr float G = 190000.0f;
+	// Set initial velocity
+	dx::XMFLOAT3 v0 = { 0.0f, 0.0f, 0.0f };
+	planet->SetVelocity(dx::XMLoadFloat3(&v0));
 
-	// Get the positions of the planets
-	dx::XMFLOAT3 p0 = pPlanets[0]->GetPos();
-	dx::XMFLOAT3 p1 = pPlanets[1]->GetPos();
+	// Gravitational constant (G)
+	const float G = 10000.f;
 
-	// Load XMFLOAT3 into XMVECTORs
-	dx::XMVECTOR vp0 = dx::XMLoadFloat3(&p0);
-	dx::XMVECTOR vp1 = dx::XMLoadFloat3(&p1);
+	// Masses of the planets
+	float mass0 = planet->GetMass();
+	float mass1 = pPlanets[1]->GetMass();
 
-	// Calculate the vector between the two planets
-	dx::XMVECTOR r01 = dx::XMVectorSubtract(vp1, vp0);
 
-	// Calculate the squared distance between planets
-	dx::XMVECTOR distsqVec = dx::XMVector3LengthSq(r01);
-	float distsq;
-	dx::XMStoreFloat(&distsq, distsqVec);
+	// Get positions of the planets
+	dx::XMFLOAT3 p0 = planet->GetPosition();
+	dx::XMFLOAT3 p1 = pPlanets[1]->GetPosition();
 
-	if (distsq == 0.0f) {
-		// Prevent division by zero if the planets are at the same position
-		return;
-	}
+	dx::XMVECTOR pos0 = dx::XMLoadFloat3(&p0);
+	dx::XMVECTOR pos1 = dx::XMLoadFloat3(&p1);
+	dx::XMVECTOR vel0 = planet->GetVelocity();
 
-	// Calculate the unit vector (normalized direction) from p0 to p1
-	dx::XMVECTOR r01hat = dx::XMVector3Normalize(r01);
+	// Lambda to compute gravitational force between two positions
+	auto computeGravitationalForce = [&](dx::XMVECTOR posA, dx::XMVECTOR posB) -> dx::XMVECTOR {
+		dx::XMVECTOR r = dx::XMVectorSubtract(posB, posA);
+		dx::XMVECTOR distSqVec = dx::XMVector3LengthSq(r);
+		float distSq;
+		dx::XMStoreFloat(&distSq, distSqVec);
+		if (distSq == 0.0f) {
+			return dx::XMVectorZero(); // Prevent division by zero
+		}
+		dx::XMVECTOR rHat = dx::XMVector3Normalize(r);
+		float forceMag = G * mass0 * mass1 / distSq;
+		dx::XMVECTOR forceVec = dx::XMVectorScale(rHat, forceMag);
+		return forceVec;
+		};
 
-	// Calculate the gravitational force magnitude
-	dx::XMVECTOR vf0 = dx::XMVectorScale(r01hat, G / distsq);
+	// Compute gravitational force at initial position
+	dx::XMVECTOR force0 = computeGravitationalForce(pos0, pos1);
 
-	dx::XMVECTOR vDt = dx::XMVectorReplicate(dt);
+	// k1 calculations
+	dx::XMVECTOR k1_p = vel0;
+	dx::XMVECTOR k1_v = planet->calcAcceleration(force0);
 
-	// Adjust force for time step
-	vf0 = dx::XMVectorMultiply(vf0, vDt);
+	// k2 calculations
+	dx::XMVECTOR pos_k2 = dx::XMVectorAdd(pos0, dx::XMVectorScale(k1_p, dt / 2.0f));
+	dx::XMVECTOR vel_k2 = dx::XMVectorAdd(vel0, dx::XMVectorScale(k1_v, dt / 2.0f));
+	dx::XMVECTOR force_k2 = computeGravitationalForce(pos_k2, pos1);
+	dx::XMVECTOR k2_p = vel_k2;
+	dx::XMVECTOR k2_v = planet->calcAcceleration(force_k2);
 
-	// Update the velocity (assuming acceleration affects velocity)
-	dx::XMVECTOR vVelocity0 = dx::XMLoadFloat3(&v0);
-	vVelocity0 = dx::XMVectorAdd(vVelocity0, vf0);
-	dx::XMStoreFloat3(&v0, vVelocity0);
+	// k3 calculations
+	dx::XMVECTOR pos_k3 = dx::XMVectorAdd(pos0, dx::XMVectorScale(k2_p, dt / 2.0f));
+	dx::XMVECTOR vel_k3 = dx::XMVectorAdd(vel0, dx::XMVectorScale(k2_v, dt / 2.0f));
+	dx::XMVECTOR force_k3 = computeGravitationalForce(pos_k3, pos1);
+	dx::XMVECTOR k3_p = vel_k3;
+	dx::XMVECTOR k3_v = planet->calcAcceleration(force_k3);
 
-	// Update the position using the new velocity
-	vp0 = dx::XMVectorMultiplyAdd(vVelocity0, vDt, vp0);
+	// k4 calculations
+	dx::XMVECTOR pos_k4 = dx::XMVectorAdd(pos0, dx::XMVectorScale(k3_p, dt));
+	dx::XMVECTOR vel_k4 = dx::XMVectorAdd(vel0, dx::XMVectorScale(k3_v, dt));
+	dx::XMVECTOR force_k4 = computeGravitationalForce(pos_k4, pos1);
+	dx::XMVECTOR k4_p = vel_k4;
+	dx::XMVECTOR k4_v = planet->calcAcceleration(force_k4);
 
-	// Store the updated position
-	dx::XMStoreFloat3(&p0, vp0);
-	pPlanets[0]->setPosition(p0);
+	// Update velocity
+	dx::XMVECTOR vel_new = dx::XMVectorAdd(vel0, dx::XMVectorScale(
+		dx::XMVectorAdd(
+			dx::XMVectorAdd(k1_v, dx::XMVectorScale(k2_v, 2.0f)),
+			dx::XMVectorAdd(dx::XMVectorScale(k3_v, 2.0f), k4_v)
+		), dt / 6.0f));
 
-	
+	// Update position
+	dx::XMVECTOR pos_new = dx::XMVectorAdd(pos0, dx::XMVectorScale(
+		dx::XMVectorAdd(
+			dx::XMVectorAdd(k1_p, dx::XMVectorScale(k2_p, 2.0f)),
+			dx::XMVectorAdd(dx::XMVectorScale(k3_p, 2.0f), k4_p)
+		), dt / 6.0f));
+
+	// Update planet's state
+	planet->SetVelocity(vel_new);
+	planet->SetVecPosition(pos_new);
 }

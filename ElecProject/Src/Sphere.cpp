@@ -75,7 +75,7 @@ void Sphere::Draw(Graphics& gfx)
 }
 
 
-void Sphere::setPosition(DirectX::XMFLOAT3 newPos)
+void Sphere::SetPosition(DirectX::XMFLOAT3 newPos)
 {
 	position = newPos;
 	updateCB();
@@ -99,7 +99,7 @@ void Sphere::setRotation(DirectX::FXMVECTOR quaternion)
 	updateCB();
 }
 
-DirectX::XMFLOAT3 Sphere::GetPos() const
+DirectX::XMFLOAT3 Sphere::GetPosition() const
 {
 	return position;
 }

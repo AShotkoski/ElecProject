@@ -13,11 +13,11 @@ public:
 		DirectX::FXMVECTOR rotation = DirectX::XMQuaternionIdentity());
 	void Draw(Graphics& gfx);
 
-	void setPosition(DirectX::XMFLOAT3 newPos);
+	void SetPosition(DirectX::XMFLOAT3 newPos);
 	void setScaling(DirectX::XMFLOAT3 newScaling);
 	void setScaling(float factor); // wraps to above
 	void setRotation(DirectX::FXMVECTOR quaternion);
-	DirectX::XMFLOAT3 GetPos() const;
+	DirectX::XMFLOAT3 GetPosition() const;
 
 private:
 	// Const Buffer structure
