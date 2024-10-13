@@ -1,5 +1,7 @@
 #include "Graphics.h"
 #include "Macros.h"
+#include "ThirdParty/ImGui/imgui_impl_dx11.h"
+#include "ThirdParty/ImGui/imgui_impl_win32.h"
 #include <sstream>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
@@ -76,6 +78,8 @@ Graphics::Graphics(HWND hWnd)
 			" minimum specs for this program.");
 	}
 
+	// Init ImGui graphics
+	ImGui_ImplDX11_Init(pDevice.Get(), pContext.Get());
 
 	// Get back buffer texture
 	WRL::ComPtr<ID3D11Texture2D> pBackBuffer;
@@ -130,21 +134,31 @@ Graphics::Graphics(HWND hWnd)
 
 Graphics::~Graphics()
 {
+	ImGui_ImplDX11_Shutdown();
 }
 
 void Graphics::BeginFrame()
 {
+	// New ImGui Frame
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
 	// Clear the RTV
 	const FLOAT clearColor[4] = { 0.f, 0.f, 0.f, 0.f }; // Clear to black
 	pContext->ClearRenderTargetView(pRenderTargetView.Get(), clearColor);
 	pContext->ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
 
 	pContext->OMSetRenderTargets(1u, pRenderTargetView.GetAddressOf(), pDepthStencilView.Get());
 }
 
 void Graphics::EndFrame()
 {
+	// ImGui
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+	ImGui::EndFrame();
 
 	HRESULT hr;
 

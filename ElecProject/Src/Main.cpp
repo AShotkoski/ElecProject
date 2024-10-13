@@ -1,6 +1,7 @@
 #include "Window.h"
 #include "BaseException.h"
 #include "Game.h"
+#include "ImGuiManager.h"
 
 int WINAPI wWinMain(
 	_In_ HINSTANCE     hInstance,
@@ -10,6 +11,8 @@ int WINAPI wWinMain(
 {
 	try
 	{
+		// Make imgui manager to do imgui management
+		ImGuiManager imgui_manage;
 
 		Game game;	// Create the game object, which will be where we program our demos and such
 

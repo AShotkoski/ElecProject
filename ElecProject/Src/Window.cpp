@@ -2,9 +2,13 @@
 #include <sstream>
 #include <hidusage.h>
 #include <windowsx.h> 
+#include "ThirdParty/ImGui/imgui_impl_win32.h"
 
 // Setup singleton
 Window::WindowClass Window::WindowClass::wndClass;
+
+// ImGUi
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
 /******************   WINDOWS CLASS    ***********************/
@@ -103,10 +107,13 @@ Window::Window( UINT Width, UINT Height, const std::wstring& Title )
 	// Create Graphics object
 	pGfx = std::make_unique<Graphics>( hWnd );
 
+	// Initialize ImGui
+	ImGui_ImplWin32_Init(hWnd);
 }
 
 Window::~Window()
 {
+	ImGui_ImplWin32_Shutdown();
 	DestroyWindow( hWnd );
 }
 
@@ -227,6 +234,10 @@ LRESULT WINAPI Window::RedirectMessageProc( HWND hWnd, UINT msg, WPARAM wParam, 
 
 LRESULT Window::MessageProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
+	// Handle ImGui msg proc
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+		return true;
+
 
 	// Main message switch
 	switch ( msg )

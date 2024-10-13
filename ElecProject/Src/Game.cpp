@@ -2,6 +2,7 @@
 #include <numbers>
 #include <d3dcompiler.h>
 #include "PhysEngine.h"
+#include "ThirdParty/ImGui/imgui.h"
 
 namespace dx = DirectX;
 using namespace Microsoft::WRL;
