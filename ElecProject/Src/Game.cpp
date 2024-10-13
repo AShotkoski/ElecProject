@@ -22,7 +22,7 @@ Game::Game()
 	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.f, dx::XMFLOAT3{ 0,0,38 }, 18.f));
 	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.5f, dx::XMFLOAT3{ -20,0,10 }, 10.f));
 
-	dx::XMFLOAT3 v0 = { 100.0f, 37.0f, -10.0f };
+	dx::XMFLOAT3 v0 = { 10.0f, 3.0f, -10.0f };
 	pPlanets[0]->SetVelocity(dx::XMLoadFloat3(&v0));
 	pPlanets[1]->SetMass(1.75e3);
 	pPlanets[0]->SetMass(5e3);
@@ -45,8 +45,6 @@ void Game::Go()
 void Game::UpdateLogic()
 {
 	ControlCamera();
-	if(wnd.kbd.KeyIsPressed('L'))
-		testPhys();
 	if (wnd.kbd.KeyIsPressed('K'))
 		testPhys2();
 }
@@ -77,10 +75,11 @@ void Game::testPhys2()
 	otherplanetmasses.push_back(pPlanets[1]->GetMass());
 
 	phys::GravForce gf(otherplanets, otherplanetmasses, 10, pPlanets[0]->GetMass());
+	phys::AltGravForce agf(otherplanets, otherplanetmasses, 1, pPlanets[0]->GetMass());
 
 	auto computeAccel = [&](const phys::State& s)
 		{
-			DirectX::XMVECTOR force = gf.compute(planet);
+			DirectX::XMVECTOR force = agf.compute(planet);
 			return dx::XMVectorScale(force, 1.0f / pPlanets[0]->GetMass());
 		};
 
@@ -154,86 +153,4 @@ void Game::ControlCamera()
 
 		gfx.GetCamera().UpdatePosition(dCampos, dt);
 	}
-}
-
-void Game::testPhys()
-{
-	auto& planet = pPlanets[0];
-
-	// Gravitational constant (G)
-	const float G = 100.f;
-
-	// Masses of the planets
-	float mass0 = planet->GetMass();
-	float mass1 = pPlanets[1]->GetMass();
-
-
-	// Get positions of the planets
-	dx::XMFLOAT3 p0 = planet->GetPosition();
-	dx::XMFLOAT3 p1 = pPlanets[1]->GetPosition();
-
-	dx::XMVECTOR pos0 = dx::XMLoadFloat3(&p0);
-	dx::XMVECTOR pos1 = dx::XMLoadFloat3(&p1);
-	dx::XMVECTOR vel0 = planet->GetVelocity();
-
-	// Lambda to compute gravitational force between two positions
-	auto computeGravitationalForce = [&](dx::XMVECTOR posA, dx::XMVECTOR posB) -> dx::XMVECTOR {
-		dx::XMVECTOR r = dx::XMVectorSubtract(posB, posA);
-		dx::XMVECTOR distSqVec = dx::XMVector3LengthSq(r);
-		float distSq;
-		dx::XMStoreFloat(&distSq, distSqVec);
-		if (distSq == 0.0f) {
-			return dx::XMVectorZero(); // Prevent division by zero
-		}
-		dx::XMVECTOR rHat = dx::XMVector3Normalize(r);
-		float forceMag = G * mass0 * mass1 / distSq;
-		dx::XMVECTOR forceVec = dx::XMVectorScale(rHat, forceMag);
-		return forceVec;
-		};
-
-	// Compute gravitational force at initial position
-	dx::XMVECTOR force0 = computeGravitationalForce(pos0, pos1);
-
-	// k1 calculations
-	dx::XMVECTOR k1_p = vel0;
-	dx::XMVECTOR k1_v = planet->calcAcceleration(force0);
-
-	// k2 calculations
-	dx::XMVECTOR pos_k2 = dx::XMVectorAdd(pos0, dx::XMVectorScale(k1_p, dt / 2.0f));
-	dx::XMVECTOR vel_k2 = dx::XMVectorAdd(vel0, dx::XMVectorScale(k1_v, dt / 2.0f));
-	dx::XMVECTOR force_k2 = computeGravitationalForce(pos_k2, pos1);
-	dx::XMVECTOR k2_p = vel_k2;
-	dx::XMVECTOR k2_v = planet->calcAcceleration(force_k2);
-
-	// k3 calculations
-	dx::XMVECTOR pos_k3 = dx::XMVectorAdd(pos0, dx::XMVectorScale(k2_p, dt / 2.0f));
-	dx::XMVECTOR vel_k3 = dx::XMVectorAdd(vel0, dx::XMVectorScale(k2_v, dt / 2.0f));
-	dx::XMVECTOR force_k3 = computeGravitationalForce(pos_k3, pos1);
-	dx::XMVECTOR k3_p = vel_k3;
-	dx::XMVECTOR k3_v = planet->calcAcceleration(force_k3);
-
-	// k4 calculations
-	dx::XMVECTOR pos_k4 = dx::XMVectorAdd(pos0, dx::XMVectorScale(k3_p, dt));
-	dx::XMVECTOR vel_k4 = dx::XMVectorAdd(vel0, dx::XMVectorScale(k3_v, dt));
-	dx::XMVECTOR force_k4 = computeGravitationalForce(pos_k4, pos1);
-	dx::XMVECTOR k4_p = vel_k4;
-	dx::XMVECTOR k4_v = planet->calcAcceleration(force_k4);
-
-	// Update velocity
-	dx::XMVECTOR vel_new = dx::XMVectorAdd(vel0, dx::XMVectorScale(
-		dx::XMVectorAdd(
-			dx::XMVectorAdd(k1_v, dx::XMVectorScale(k2_v, 2.0f)),
-			dx::XMVectorAdd(dx::XMVectorScale(k3_v, 2.0f), k4_v)
-		), dt / 6.0f));
-
-	// Update position
-	dx::XMVECTOR pos_new = dx::XMVectorAdd(pos0, dx::XMVectorScale(
-		dx::XMVectorAdd(
-			dx::XMVectorAdd(k1_p, dx::XMVectorScale(k2_p, 2.0f)),
-			dx::XMVectorAdd(dx::XMVectorScale(k3_p, 2.0f), k4_p)
-		), dt / 6.0f));
-
-	// Update planet's state
-	planet->SetVelocity(vel_new);
-	planet->SetVecPosition(pos_new);
 }

@@ -151,6 +151,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Src\ImGuiManager.cpp" />
     <ClCompile Include="Src\Planet.cpp" />
     <ClCompile Include="Src\Sphere.cpp" />
     <ClCompile Include="Src\BaseException.cpp" />
@@ -162,9 +163,17 @@
     <ClCompile Include="Src\Keyboard.cpp" />
     <ClCompile Include="Src\Main.cpp" />
     <ClCompile Include="Src\Mouse.cpp" />
+    <ClCompile Include="Src\ThirdParty\ImGui\imgui.cpp" />
+    <ClCompile Include="Src\ThirdParty\ImGui\imgui_demo.cpp" />
+    <ClCompile Include="Src\ThirdParty\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="Src\ThirdParty\ImGui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="Src\ThirdParty\ImGui\imgui_impl_win32.cpp" />
+    <ClCompile Include="Src\ThirdParty\ImGui\imgui_tables.cpp" />
+    <ClCompile Include="Src\ThirdParty\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="Src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\ImGuiManager.h" />
     <ClInclude Include="Src\PhysEngine.h" />
     <ClInclude Include="Src\Planet.h" />
     <ClInclude Include="Src\Sphere.h" />
@@ -177,6 +186,14 @@
     <ClInclude Include="Src\Keyboard.h" />
     <ClInclude Include="Src\Macros.h" />
     <ClInclude Include="Src\Mouse.h" />
+    <ClInclude Include="Src\ThirdParty\ImGui\imconfig.h" />
+    <ClInclude Include="Src\ThirdParty\ImGui\imgui.h" />
+    <ClInclude Include="Src\ThirdParty\ImGui\imgui_impl_dx11.h" />
+    <ClInclude Include="Src\ThirdParty\ImGui\imgui_impl_win32.h" />
+    <ClInclude Include="Src\ThirdParty\ImGui\imgui_internal.h" />
+    <ClInclude Include="Src\ThirdParty\ImGui\imstb_rectpack.h" />
+    <ClInclude Include="Src\ThirdParty\ImGui\imstb_textedit.h" />
+    <ClInclude Include="Src\ThirdParty\ImGui\imstb_truetype.h" />
     <ClInclude Include="Src\Win.h" />
     <ClInclude Include="Src\Window.h" />
   </ItemGroup>

@@ -18,7 +18,6 @@ private:
 	// Wraps the if's for controlling the camera
 	void ControlCamera();
 
-	void testPhys();
 	void testPhys2();
 
 
