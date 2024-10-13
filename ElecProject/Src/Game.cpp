@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <numbers>
 #include <d3dcompiler.h>
+#include "PhysEngine.h"
 
 namespace dx = DirectX;
 using namespace Microsoft::WRL;
@@ -20,6 +21,11 @@ Game::Game()
 	// Add planets
 	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.f, dx::XMFLOAT3{ 0,0,38 }, 18.f));
 	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.5f, dx::XMFLOAT3{ -20,0,10 }, 10.f));
+
+	dx::XMFLOAT3 v0 = { 100.0f, 37.0f, -10.0f };
+	pPlanets[0]->SetVelocity(dx::XMLoadFloat3(&v0));
+	pPlanets[1]->SetMass(1.75e3);
+	pPlanets[0]->SetMass(5e3);
 }
 
 Game::~Game()
@@ -41,6 +47,8 @@ void Game::UpdateLogic()
 	ControlCamera();
 	if(wnd.kbd.KeyIsPressed('L'))
 		testPhys();
+	if (wnd.kbd.KeyIsPressed('K'))
+		testPhys2();
 }
 
 void Game::DrawFrame()
@@ -50,6 +58,36 @@ void Game::DrawFrame()
 	{
 		p->Draw(gfx);
 	}
+}
+
+void Game::testPhys2()
+{
+	
+
+	phys::State planet;
+	planet.position = pPlanets[0]->GetVecPosition();
+	planet.velocity = pPlanets[0]->GetVelocity();
+
+	std::vector<phys::State> otherplanets;
+	phys::State otherstate;
+	otherstate.position = pPlanets[1]->GetVecPosition();
+	otherstate.velocity = pPlanets[1]->GetVelocity();
+	otherplanets.push_back(std::move(otherstate));
+	std::vector<float> otherplanetmasses;
+	otherplanetmasses.push_back(pPlanets[1]->GetMass());
+
+	phys::GravForce gf(otherplanets, otherplanetmasses, 10, pPlanets[0]->GetMass());
+
+	auto computeAccel = [&](const phys::State& s)
+		{
+			DirectX::XMVECTOR force = gf.compute(planet);
+			return dx::XMVectorScale(force, 1.0f / pPlanets[0]->GetMass());
+		};
+
+	rk4Integrate(planet, dt, computeAccel);
+	// Update the planet
+	pPlanets[0]->SetVecPosition(planet.position);
+	pPlanets[0]->SetVelocity(planet.velocity);
 }
 
 void Game::ControlCamera()
@@ -122,12 +160,8 @@ void Game::testPhys()
 {
 	auto& planet = pPlanets[0];
 
-	// Set initial velocity
-	dx::XMFLOAT3 v0 = { 0.0f, 0.0f, 0.0f };
-	planet->SetVelocity(dx::XMLoadFloat3(&v0));
-
 	// Gravitational constant (G)
-	const float G = 10000.f;
+	const float G = 100.f;
 
 	// Masses of the planets
 	float mass0 = planet->GetMass();

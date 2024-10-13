@@ -2,6 +2,7 @@
 #include "Window.h"
 #include "FrameTimer.h"
 #include "Planet.h"
+#include <functional>
 
 class Game
 {
@@ -18,6 +19,8 @@ private:
 	void ControlCamera();
 
 	void testPhys();
+	void testPhys2();
+
 
 private:
 	Window wnd;
@@ -33,6 +36,6 @@ private:
 	static constexpr const wchar_t* WindowTitle = L"Rendering engine";
 	static constexpr float NearClipping = 0.1f;
 	static constexpr float FarClipping = 1300.0f;
-	static constexpr float Fov = 70.f; // degrees
+	static constexpr float Fov = 105.f; // degrees
 };
 

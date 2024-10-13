@@ -26,10 +26,10 @@ private:
 	float pitch;
 	float yaw;
 	static constexpr float Sensitivity = 17.f / 10000.f;
-	float MoveSpeed = 15.f;
+	float MoveSpeed = 35.f;
 
 	// Defaults
-	static constexpr DirectX::XMFLOAT3 def_pos = { 0,0,-5.5f };
+	static constexpr DirectX::XMFLOAT3 def_pos = { 0,0,-50.5f };
 	static constexpr float def_pitch = 0.f;
 	static constexpr float def_yaw = 0.f;
 
