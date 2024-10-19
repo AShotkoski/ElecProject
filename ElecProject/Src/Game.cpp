@@ -57,21 +57,29 @@ void Game::DrawFrame()
 	{
 		p->Draw(gfx);
 	}
+
+	
 }
 
 void Game::testPhys2()
 {
+	auto getPlanetState = [](const Planet& p) -> phys::State
+	{
+			phys::State ret;
+			ret.position = p.GetVecPosition();
+			ret.velocity = p.GetVelocity();
+			return ret;
+	};
+
+	phys::State planet = getPlanetState(*pPlanets[0]);
+	//planet.position = pPlanets[0]->GetVecPosition();
+	//planet.velocity = pPlanets[0]->GetVelocity();
 	
 
-	phys::State planet;
-	planet.position = pPlanets[0]->GetVecPosition();
-	planet.velocity = pPlanets[0]->GetVelocity();
-
 	std::vector<phys::State> otherplanets;
-	phys::State otherstate;
-	otherstate.position = pPlanets[1]->GetVecPosition();
-	otherstate.velocity = pPlanets[1]->GetVelocity();
-	otherplanets.push_back(std::move(otherstate));
+
+	otherplanets.push_back(getPlanetState(*pPlanets[1]));
+
 	std::vector<float> otherplanetmasses;
 	otherplanetmasses.push_back(pPlanets[1]->GetMass());
 
