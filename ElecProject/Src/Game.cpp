@@ -24,12 +24,16 @@ Game::Game()
 	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.f, dx::XMFLOAT3{ 0,0,0 }, 18.f));
 	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.5f, dx::XMFLOAT3{ -20,0,10 }, 10.f));
 	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 1.25f, dx::XMFLOAT3{ -10,10,00 }, 10.f));
-	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 1.25f, dx::XMFLOAT3{ -25,-15,8 }, 10.f));
 
-	dx::XMFLOAT3 v0 = { 18.0f, 3.0f, -18.0f };
+	dx::XMFLOAT3 v0 = { -7.0f, 3.0f, 18.0f };
 	pPlanets[0]->SetVelocity(dx::XMLoadFloat3(&v0));
-	pPlanets[0]->SetMass(5e4);
-	pPlanets[1]->SetMass(1);
+	v0 = { 1.f,9.f,3.f };
+	pPlanets[1]->SetVelocity(dx::XMLoadFloat3(&v0));
+	v0 = { -1.f,-9.f,3.f };
+	pPlanets[2]->SetVelocity(dx::XMLoadFloat3(&v0));
+	pPlanets[0]->SetMass(1800);
+	pPlanets[1]->SetMass(1000);
+	pPlanets[2]->SetMass(1000);
 }
 
 Game::~Game()
@@ -49,10 +53,15 @@ void Game::Go()
 void Game::UpdateLogic()
 {
 	ControlCamera();
-	if (wnd.kbd.KeyIsPressed('K'))
+
+	if (isPhysicsEnabled)
 		testPhys2();
 
-
+	ImGui::Begin("test");
+	//ImGui::DragFloat("G", &Gravitational_Const, 0.001, 0);
+	ImGui::InputFloat("G", &Gravitational_Const, 0.0f, 0.0f, "%e");
+	ImGui::Checkbox("Physics", &isPhysicsEnabled);
+	ImGui::End();
 }
 
 void Game::DrawFrame()
@@ -63,7 +72,7 @@ void Game::DrawFrame()
 		p->Draw(gfx);
 	}	
 	wnd.GFX().GetCamera().spawnControlWindow();
-	ImGui::ShowDemoWindow();
+	//ImGui::ShowDemoWindow();
 }
 
 void Game::testPhys2()
@@ -109,7 +118,7 @@ void Game::testPhys2()
 		}
 
 		// Gravitational force computation for planet i
-		phys::GravForce agf(otherStates, otherMasses, 1, planetMasses[i]);
+		phys::GravForce agf(otherStates, otherMasses, Gravitational_Const, planetMasses[i]);
 
 		// Acceleration lambda for integration
 		auto computeAccel = [&](const phys::State& s)

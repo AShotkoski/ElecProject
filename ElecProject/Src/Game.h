@@ -18,8 +18,9 @@ private:
 	// Wraps the if's for controlling the camera
 	void ControlCamera();
 
+	// This function will be reworked at some point
 	void testPhys2();
-
+	float Gravitational_Const = 1.5e-2;
 
 private:
 	Window wnd;
@@ -36,5 +37,6 @@ private:
 	static constexpr float NearClipping = 0.1f;
 	static constexpr float FarClipping = 1300.0f;
 	static constexpr float Fov = 105.f; // degrees
+	bool isPhysicsEnabled = false;
 };
 
