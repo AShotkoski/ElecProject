@@ -1,0 +1,19 @@
+This project is made for Elec 1520.
+
+##########################
+The parts to care about:
+The main class where the game loop is executed is the Game class (Game.h and Game.cpp).
+The function UpdateLogic and DrawFrame are called each frame in that order
+so this is where anything you want drawn or updated should be placed. The difference
+between these functions is purely organizational, anything that updates 
+any object on screen should be placed in UpdateLogic and DrawFrame should only
+contain draw commands. This way objects are updated before being drawn. 
+
+##########################
+Getting user input:
+The way to detect button or mouse pressed is by using wnd.mouse and wnd.keyboard respectively
+The basic way you would detect if a button is being pressed is 
+	if(wnd.kbd.KeyIsPressed('L'))
+	{ actions }
+
+

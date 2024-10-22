@@ -262,6 +262,9 @@
   <ItemGroup>
     <None Include="Src\Header.hlsli" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Guide.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
