@@ -16,6 +16,7 @@ public:
 	void DisableMouseControl();
 	bool isMouseControlEnabled() const;
 	void UpdateMovementSpeed(float factor);
+	void spawnControlWindow();
 private:
 	void CalculateMatrices();
 private:

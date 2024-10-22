@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "ThirdParty/ImGui/imgui.h"
 #include <algorithm>
 
 using namespace DirectX;
@@ -70,6 +71,20 @@ void Camera::UpdateMovementSpeed(float factor)
 {
 	assert(factor >= 0.f && factor < 100.f);
 	MoveSpeed *= factor;
+}
+
+void Camera::spawnControlWindow()
+{
+	ImGui::Begin("Camera Control");
+	if (ImGui::DragFloat3(
+		"Position:",
+		&Position.x
+	))
+	{
+		CalculateMatrices();
+	}
+	ImGui::DragFloat("Move speed", &MoveSpeed, 1.f, 0.f, 2000.f);
+	ImGui::End();
 }
 
 

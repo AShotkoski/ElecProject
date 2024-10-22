@@ -3,6 +3,7 @@
 #include <d3dcompiler.h>
 #include "PhysEngine.h"
 #include "ThirdParty/ImGui/imgui.h"
+#include <random>
 
 namespace dx = DirectX;
 using namespace Microsoft::WRL;
@@ -20,13 +21,15 @@ Game::Game()
 	);
 
 	// Add planets
-	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.f, dx::XMFLOAT3{ 0,0,38 }, 18.f));
+	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.f, dx::XMFLOAT3{ 0,0,0 }, 18.f));
 	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.5f, dx::XMFLOAT3{ -20,0,10 }, 10.f));
+	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 1.25f, dx::XMFLOAT3{ -10,10,00 }, 10.f));
+	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 1.25f, dx::XMFLOAT3{ -25,-15,8 }, 10.f));
 
-	dx::XMFLOAT3 v0 = { 10.0f, 3.0f, -10.0f };
+	dx::XMFLOAT3 v0 = { 18.0f, 3.0f, -18.0f };
 	pPlanets[0]->SetVelocity(dx::XMLoadFloat3(&v0));
-	pPlanets[1]->SetMass(1.75e3);
-	pPlanets[0]->SetMass(5e3);
+	pPlanets[0]->SetMass(5e4);
+	pPlanets[1]->SetMass(1);
 }
 
 Game::~Game()
@@ -48,6 +51,8 @@ void Game::UpdateLogic()
 	ControlCamera();
 	if (wnd.kbd.KeyIsPressed('K'))
 		testPhys2();
+
+
 }
 
 void Game::DrawFrame()
@@ -56,46 +61,106 @@ void Game::DrawFrame()
 	for (auto& p : pPlanets)
 	{
 		p->Draw(gfx);
-	}
-
-	
+	}	
+	wnd.GFX().GetCamera().spawnControlWindow();
+	ImGui::ShowDemoWindow();
 }
 
 void Game::testPhys2()
 {
 	auto getPlanetState = [](const Planet& p) -> phys::State
-	{
+		{
 			phys::State ret;
 			ret.position = p.GetVecPosition();
 			ret.velocity = p.GetVelocity();
 			return ret;
-	};
-
-	phys::State planet = getPlanetState(*pPlanets[0]);
-	//planet.position = pPlanets[0]->GetVecPosition();
-	//planet.velocity = pPlanets[0]->GetVelocity();
-	
-
-	std::vector<phys::State> otherplanets;
-
-	otherplanets.push_back(getPlanetState(*pPlanets[1]));
-
-	std::vector<float> otherplanetmasses;
-	otherplanetmasses.push_back(pPlanets[1]->GetMass());
-
-	phys::GravForce gf(otherplanets, otherplanetmasses, 10, pPlanets[0]->GetMass());
-	phys::AltGravForce agf(otherplanets, otherplanetmasses, 1, pPlanets[0]->GetMass());
-
-	auto computeAccel = [&](const phys::State& s)
-		{
-			DirectX::XMVECTOR force = agf.compute(planet);
-			return dx::XMVectorScale(force, 1.0f / pPlanets[0]->GetMass());
 		};
 
-	rk4Integrate(planet, dt, computeAccel);
-	// Update the planet
-	pPlanets[0]->SetVecPosition(planet.position);
-	pPlanets[0]->SetVelocity(planet.velocity);
+	size_t n = pPlanets.size();
+
+	// Create vectors to hold the states and masses of all planets (super efficient lol)
+	std::vector<phys::State> planetStates(n);
+	std::vector<float> planetMasses(n);
+
+	// Get all masses
+	for (size_t i = 0; i < n; ++i)
+	{
+		planetStates[i] = getPlanetState(*pPlanets[i]);
+		planetMasses[i] = pPlanets[i]->GetMass();
+	}
+
+	// Copy OG states 
+	std::vector<phys::State> originalStates = planetStates;
+
+	// For each planet, compute the acceleration due to other planets and integrate
+	for (size_t i = 0; i < n; ++i)
+	{
+		// make vectors of other planets' states and masses
+		std::vector<phys::State> otherStates;
+		std::vector<float> otherMasses;
+
+		for (size_t j = 0; j < n; ++j)
+		{
+			if (j != i)
+			{
+				otherStates.push_back(originalStates[j]);
+				otherMasses.push_back(planetMasses[j]);
+			}
+		}
+
+		// Gravitational force computation for planet i
+		phys::GravForce agf(otherStates, otherMasses, 1, planetMasses[i]);
+
+		// Acceleration lambda for integration
+		auto computeAccel = [&](const phys::State& s)
+			{
+				DirectX::XMVECTOR force = agf.compute(s);
+				return dx::XMVectorScale(force, 1.0f / planetMasses[i]);
+			};
+		// Acceleration lambda alt integration
+		auto computeAccelBox = [&](const phys::State& s)
+			{
+				DirectX::XMVECTOR accel = dx::XMVectorZero();
+				// Define the bounding sphere radius
+				const float maxR = 50.0f;
+
+				// Compute the distance from the origin to the object
+				float dist;
+				dx::XMStoreFloat(&dist, dx::XMVector3Length(s.position));
+
+				if (dist > maxR)
+				{
+					// Calculate the penetration depth
+					float penetrationDepth = dist - maxR;
+
+					// Compute the normal vector pointing towards the center of the sphere
+					DirectX::XMVECTOR normal = dx::XMVector3Normalize(s.position);
+
+					// Apply an acceleration proportional to the penetration depth
+					// Negative sign to push the object back inside the sphere
+					accel = dx::XMVectorScale(normal, -penetrationDepth);
+
+					// add damping to prevent oscillations
+					const float dampingFactor = 0.5f;
+					DirectX::XMVECTOR velocityAlongNormal = dx::XMVectorScale(normal, dx::XMVectorGetX(dx::XMVector3Dot(s.velocity, normal)));
+					accel = dx::XMVectorSubtract(accel, dx::XMVectorScale(velocityAlongNormal, dampingFactor));
+				}
+
+				return accel;
+			};
+
+		// Integrate the state of planet i
+		rk4Integrate(planetStates[i], dt, computeAccel);
+		// Integrate for the bounding "box"
+		rk4Integrate(planetStates[i], dt, computeAccelBox);
+	}
+
+	// Update the planets with their new positions and velocities
+	for (size_t i = 0; i < n; ++i)
+	{
+		pPlanets[i]->SetVecPosition(planetStates[i].position);
+		pPlanets[i]->SetVelocity(planetStates[i].velocity);
+	}
 }
 
 void Game::ControlCamera()
