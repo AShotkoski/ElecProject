@@ -58,7 +58,6 @@ void Game::UpdateLogic()
 		testPhys2();
 
 	ImGui::Begin("test");
-	//ImGui::DragFloat("G", &Gravitational_Const, 0.001, 0);
 	ImGui::InputFloat("G", &Gravitational_Const, 0.0f, 0.0f, "%e");
 	ImGui::Checkbox("Physics", &isPhysicsEnabled);
 	ImGui::End();
@@ -85,14 +84,14 @@ void Game::testPhys2()
 			return ret;
 		};
 
-	size_t n = pPlanets.size();
+	size_t numPlanets = pPlanets.size();
 
-	// Create vectors to hold the states and masses of all planets (super efficient lol)
-	std::vector<phys::State> planetStates(n);
-	std::vector<float> planetMasses(n);
+	// Create vectors to hold the states and masses of all planets (super efficient)
+	std::vector<phys::State> planetStates(numPlanets);
+	std::vector<float> planetMasses(numPlanets);
 
 	// Get all masses
-	for (size_t i = 0; i < n; ++i)
+	for (size_t i = 0; i < numPlanets; ++i)
 	{
 		planetStates[i] = getPlanetState(*pPlanets[i]);
 		planetMasses[i] = pPlanets[i]->GetMass();
@@ -102,13 +101,13 @@ void Game::testPhys2()
 	std::vector<phys::State> originalStates = planetStates;
 
 	// For each planet, compute the acceleration due to other planets and integrate
-	for (size_t i = 0; i < n; ++i)
+	for (size_t i = 0; i < numPlanets; ++i)
 	{
 		// make vectors of other planets' states and masses
 		std::vector<phys::State> otherStates;
 		std::vector<float> otherMasses;
 
-		for (size_t j = 0; j < n; ++j)
+		for (size_t j = 0; j < numPlanets; ++j)
 		{
 			if (j != i)
 			{
@@ -165,7 +164,7 @@ void Game::testPhys2()
 	}
 
 	// Update the planets with their new positions and velocities
-	for (size_t i = 0; i < n; ++i)
+	for (size_t i = 0; i < numPlanets; ++i)
 	{
 		pPlanets[i]->SetVecPosition(planetStates[i].position);
 		pPlanets[i]->SetVelocity(planetStates[i].velocity);
