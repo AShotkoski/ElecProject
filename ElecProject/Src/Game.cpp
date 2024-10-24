@@ -24,6 +24,7 @@ Game::Game()
 	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.f, dx::XMFLOAT3{ 0,0,0 }, 18.f));
 	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.5f, dx::XMFLOAT3{ -20,0,10 }, 10.f));
 	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 1.25f, dx::XMFLOAT3{ -10,10,00 }, 10.f));
+	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 1.25f, dx::XMFLOAT3{ 20,10,00 }, 20.f));
 
 	dx::XMFLOAT3 v0 = { -7.0f, 3.0f, 18.0f };
 	pPlanets[0]->SetVelocity(dx::XMLoadFloat3(&v0));
@@ -34,6 +35,7 @@ Game::Game()
 	pPlanets[0]->SetMass(1800);
 	pPlanets[1]->SetMass(1000);
 	pPlanets[2]->SetMass(1000);
+	pPlanets[3]->SetMass(1000000);
 }
 
 Game::~Game()
