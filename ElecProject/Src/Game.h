@@ -22,6 +22,8 @@ private:
 	void testPhys2();
 	float Gravitational_Const = 1.5e1;
 
+	void testDrawImGui();
+
 private:
 	Window wnd;
 	Graphics& gfx;

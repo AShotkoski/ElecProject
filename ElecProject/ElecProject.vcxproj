@@ -173,6 +173,7 @@
     <ClCompile Include="Src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\ImGuiCustom.h" />
     <ClInclude Include="Src\ImGuiManager.h" />
     <ClInclude Include="Src\PhysEngine.h" />
     <ClInclude Include="Src\Planet.h" />

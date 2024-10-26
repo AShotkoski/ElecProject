@@ -146,6 +146,9 @@
     <ClInclude Include="Src\ThirdParty\ImGui\imstb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Src\ImGuiCustom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Src\PixelShader.hlsl" />
@@ -153,5 +156,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Src\Header.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Guide.txt" />
   </ItemGroup>
 </Project>
