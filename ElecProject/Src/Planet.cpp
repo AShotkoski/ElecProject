@@ -20,14 +20,26 @@ void Planet::SetMass(float newMass)
 	_invMass = 1.0f / _mass;
 }
 
-DirectX::CXMVECTOR Planet::GetVelocity() const
+DirectX::CXMVECTOR Planet::GetVecVelocity() const
 {
 	return _vel;
 }
 
-void Planet::SetVelocity(DirectX::CXMVECTOR newVelocity)
+void Planet::SetVecVelocity(DirectX::CXMVECTOR newVelocity)
 {
 	_vel = newVelocity;
+}
+
+DirectX::XMFLOAT3 Planet::GetVelocity() const
+{
+	DirectX::XMFLOAT3 f3vel;
+	DirectX::XMStoreFloat3(&f3vel, GetVecVelocity());
+	return f3vel;
+}
+
+void Planet::SetVelocity(const DirectX::XMFLOAT3& newVel)
+{
+	SetVecVelocity(DirectX::XMLoadFloat3(&newVel));
 }
 
 DirectX::XMVECTOR Planet::calcAcceleration(DirectX::CXMVECTOR force) const

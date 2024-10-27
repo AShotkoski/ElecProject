@@ -21,8 +21,10 @@ public:
     // Physics Getters and Setters
     float GetMass() const;
     void SetMass(float newMass);
-    DirectX::CXMVECTOR GetVelocity() const;
-    void SetVelocity(DirectX::CXMVECTOR newVelocity);
+    DirectX::CXMVECTOR GetVecVelocity() const;
+    void SetVecVelocity(DirectX::CXMVECTOR newVelocity);
+    DirectX::XMFLOAT3 GetVelocity() const;
+    void SetVelocity(const DirectX::XMFLOAT3& newVel);
     // Returns the acceleration from a given force
     DirectX::XMVECTOR calcAcceleration(DirectX::CXMVECTOR force) const;
     DirectX::XMVECTOR GetVecPosition() const;

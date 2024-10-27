@@ -26,11 +26,11 @@ Game::Game()
 	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 1.25f, dx::XMFLOAT3{ -10,10,00 }, 10.f));
 
 	dx::XMFLOAT3 v0 = { -7.0f, 3.0f, 18.0f };
-	pPlanets[0]->SetVelocity(dx::XMLoadFloat3(&v0));
+	pPlanets[0]->SetVecVelocity(dx::XMLoadFloat3(&v0));
 	v0 = { 1.f,9.f,3.f };
-	pPlanets[1]->SetVelocity(dx::XMLoadFloat3(&v0));
+	pPlanets[1]->SetVecVelocity(dx::XMLoadFloat3(&v0));
 	v0 = { -1.f,-9.f,3.f };
-	pPlanets[2]->SetVelocity(dx::XMLoadFloat3(&v0));
+	pPlanets[2]->SetVecVelocity(dx::XMLoadFloat3(&v0));
 	pPlanets[0]->SetMass(1800);
 	pPlanets[1]->SetMass(1000);
 	pPlanets[2]->SetMass(1000);
@@ -99,7 +99,7 @@ void Game::testPhys2()
 		{
 			phys::State ret;
 			ret.position = p.GetVecPosition();
-			ret.velocity = p.GetVelocity();
+			ret.velocity = p.GetVecVelocity();
 			return ret;
 		};
 
@@ -186,7 +186,7 @@ void Game::testPhys2()
 	for (size_t i = 0; i < numPlanets; ++i)
 	{
 		pPlanets[i]->SetVecPosition(planetStates[i].position);
-		pPlanets[i]->SetVelocity(planetStates[i].velocity);
+		pPlanets[i]->SetVecVelocity(planetStates[i].velocity);
 	}
 }
 
