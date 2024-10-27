@@ -75,15 +75,26 @@ void Game::DrawFrame()
 	float xNDC = outx / 100;
 	float yNDC = outy / 100;
 
-	DirectX::XMVECTOR rayDirView = dx::XMVectorSet(xNDC, yNDC, 1.f, 0.f);
-	rayDirView = dx::XMVector3Normalize(rayDirView);
-	DirectX::XMVECTOR rayDirWorld = dx::XMVector3TransformNormal(rayDirView, gfx.GetCamera().GetInvMatrix());
-	rayDirWorld = dx::XMVector3Normalize(rayDirWorld);
-	float dist = 50.f;
-	dx::XMFLOAT3 camPosFl = gfx.GetCamera().GetPosition();
-	DirectX::XMVECTOR worldCoords = dx::XMVectorAdd(dx::XMLoadFloat3(&camPosFl), dx::XMVectorScale(rayDirWorld, dist));
+	// Unproject NDC to View Space
+	DirectX::XMMATRIX projectionMatrix = gfx.GetProjection();
+	DirectX::XMMATRIX invProjMatrix = DirectX::XMMatrixInverse(nullptr, projectionMatrix);
+	DirectX::XMVECTOR rayClip = DirectX::XMVectorSet(xNDC, yNDC, 1.0f, 1.0f);
+	DirectX::XMVECTOR rayEye = DirectX::XMVector4Transform(rayClip, invProjMatrix);
+	rayEye = DirectX::XMVectorSetW(rayEye, 0.0f); // We set w to 0 for direction vectors
+
+	// Transform to World Space
+	DirectX::XMMATRIX invViewMatrix = gfx.GetCamera().GetInvMatrix();
+	DirectX::XMVECTOR rayDirWorld = DirectX::XMVector3TransformNormal(rayEye, invViewMatrix);
+	rayDirWorld = DirectX::XMVector3Normalize(rayDirWorld);
+
+	// Calculate World Coordinates Along the Ray
+	DirectX::XMFLOAT3 camPosFl = gfx.GetCamera().GetPosition();
+	DirectX::XMVECTOR camPos = DirectX::XMLoadFloat3(&camPosFl);
+	float dist = 50.0f;
+	DirectX::XMVECTOR worldCoords = DirectX::XMVectorAdd(camPos, DirectX::XMVectorScale(rayDirWorld, dist));
 	
-	// pPlanets[0]->SetVecPosition(worldCoords);
+	ImGui::Text("Intersection? %d", pPlanets[0]->isRayIntersecting(rayDirWorld, dx::XMLoadFloat3(&camPosFl)));
+	 pPlanets[1]->SetVecPosition(worldCoords);
 	
 	ImGui::End();
 }

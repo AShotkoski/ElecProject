@@ -3,6 +3,7 @@
 
 Planet::Planet(Graphics& gfx, float patternseed, DirectX::XMFLOAT3 pos /*= { 0,0,0 }*/, float radius /*= 1.0f*/)
 	: Sphere(gfx, patternseed, pos, {radius/2, radius/2, radius/2})
+	, radius(radius)
 {
 
 }
@@ -58,4 +59,25 @@ void Planet::SetVecPosition(DirectX::CXMVECTOR newPos)
 	DirectX::XMFLOAT3 p;
 	DirectX::XMStoreFloat3(&p, newPos);
 	SetPosition(p);
+}
+
+bool Planet::isRayIntersecting(DirectX::CXMVECTOR rayDir, DirectX::CXMVECTOR rayOrigin)
+{
+	namespace dx = DirectX;
+	// Do it in world space cause why not ig its already worlds least
+	// efficient program lol
+	auto vDirSq = dx::XMVector3LengthSq(rayDir);
+	float a = 0;
+	dx::XMStoreFloat(&a, vDirSq);
+	auto dirDotOrigin = dx::XMVector3Dot(rayDir, rayOrigin);
+	float b = 0;
+	dx::XMStoreFloat(&b, dirDotOrigin);
+	b *= 2.f;
+	auto vOriginSq = dx::XMVector3LengthSq(rayOrigin);
+	float c = 0;
+	dx::XMStoreFloat(&c, vOriginSq);
+	c -= radius * radius;
+
+	float discriminant = b * b - 4 * a * c;
+	return discriminant >= 0;
 }
