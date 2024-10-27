@@ -22,8 +22,6 @@ private:
 	void testPhys2();
 	float Gravitational_Const = 1.5e1;
 
-	void testDrawImGui();
-
 private:
 	Window wnd;
 	Graphics& gfx;
@@ -37,7 +35,7 @@ private:
 	static constexpr UINT ScreenHeight = 954u;
 	static constexpr const wchar_t* WindowTitle = L"Rendering engine for Elec 1520";
 	static constexpr float NearClipping = 0.1f;
-	static constexpr float FarClipping = 1300.0f;
+	static constexpr float FarClipping = 830.0f;
 	static constexpr float Fov = 103.f; // degrees
 	bool isPhysicsEnabled = false;
 };

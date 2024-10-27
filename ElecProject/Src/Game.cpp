@@ -61,9 +61,6 @@ void Game::UpdateLogic()
 	ImGui::InputFloat("G", &Gravitational_Const, 0.0f, 0.0f, "%e");
 	ImGui::Checkbox("Physics", &isPhysicsEnabled);
 	ImGui::End();
-
-
-	ImGui::DragFloat("Drag G", &Gravitational_Const, 0.000001f, 0, 1000, "%.8f");
 }
 
 void Game::DrawFrame()
@@ -75,12 +72,24 @@ void Game::DrawFrame()
 	}	
 	wnd.GFX().GetCamera().spawnControlWindow();
 	//ImGui::ShowDemoWindow();
-	//testDrawImGui();
+
 	ImGui::Begin("Vec2d selection");
 	float outx, outy;
 	ImGuiCustom::Vec2DInput("Test input ", &outx, &outy);
-	ImGuiCustom::Vec2DInput("Test input 2", &outx, &outy);
-	ImGui::Text("(%f, %f)", outx, outy);
+	
+	float xNDC = outx / 100;
+	float yNDC = outy / 100;
+
+	DirectX::XMVECTOR rayDirView = dx::XMVectorSet(xNDC, yNDC, 1.f, 0.f);
+	rayDirView = dx::XMVector3Normalize(rayDirView);
+	DirectX::XMVECTOR rayDirWorld = dx::XMVector3TransformNormal(rayDirView, gfx.GetCamera().GetInvMatrix());
+	rayDirWorld = dx::XMVector3Normalize(rayDirWorld);
+	float dist = 50.f;
+	dx::XMFLOAT3 camPosFl = gfx.GetCamera().GetPosition();
+	DirectX::XMVECTOR worldCoords = dx::XMVectorAdd(dx::XMLoadFloat3(&camPosFl), dx::XMVectorScale(rayDirWorld, dist));
+	
+	// pPlanets[0]->SetVecPosition(worldCoords);
+	
 	ImGui::End();
 }
 
@@ -179,129 +188,6 @@ void Game::testPhys2()
 		pPlanets[i]->SetVecPosition(planetStates[i].position);
 		pPlanets[i]->SetVelocity(planetStates[i].velocity);
 	}
-}
-
-void Game::testDrawImGui()
-{
-	struct VectorInput {
-		bool isDragging = false;
-		ImVec2 startPos;
-		ImVec2 currentPos;
-		ImVec2 velocity;
-	} static vectorInput;
-
-	// In your main loop
-	ImGui::Begin("Vector Selector");
-
-	// Obtain the canvas size and position
-	ImVec2 canvasPos = ImGui::GetCursorScreenPos();
-	ImVec2 canvasSize = ImGui::GetContentRegionAvail();
-
-	// Ensure the canvas has a minimum size
-	if (canvasSize.x < 50.0f) canvasSize.x = 50.0f;
-	if (canvasSize.y < 50.0f) canvasSize.y = 50.0f;
-
-	// Draw canvas background and border
-	ImDrawList* drawList = ImGui::GetWindowDrawList();
-	drawList->AddRectFilled(canvasPos, ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y), IM_COL32(30, 30, 30, 255));
-	drawList->AddRect(canvasPos, ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y), IM_COL32(255, 255, 255, 255));
-
-	// Add an invisible button over the canvas area to capture mouse events
-	ImGui::InvisibleButton("canvas", canvasSize);
-
-	// Check if the mouse is hovering over the canvas
-	bool isHoveringCanvas = ImGui::IsItemHovered();
-
-	// Get the mouse position relative to the canvas
-	ImVec2 mousePosInCanvas = ImVec2(ImGui::GetIO().MousePos.x - canvasPos.x, ImGui::GetIO().MousePos.y - canvasPos.y);
-
-	// Handle input
-	if (isHoveringCanvas && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-		vectorInput.isDragging = true;
-		vectorInput.startPos = mousePosInCanvas;
-		vectorInput.currentPos = mousePosInCanvas;
-	}
-
-	if (vectorInput.isDragging) {
-		if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
-			vectorInput.isDragging = false;
-			vectorInput.velocity = ImVec2(vectorInput.currentPos.x - vectorInput.startPos.x,
-				vectorInput.currentPos.y - vectorInput.startPos.y);
-		}
-		else {
-			vectorInput.currentPos = mousePosInCanvas;
-		}
-	}
-
-	// Function to check if a vector is approximately zero
-	auto IsVectorZero = [](const ImVec2& vec) {
-		const float threshold = 1e-6f;
-		return (fabsf(vec.x) < threshold) && (fabsf(vec.y) < threshold);
-		};
-
-	// Draw existing vector if it's not zero
-	if (!IsVectorZero(vectorInput.velocity)) {
-		ImVec2 startPos = ImVec2(canvasPos.x + vectorInput.startPos.x, canvasPos.y + vectorInput.startPos.y);
-		ImVec2 endPos = ImVec2(startPos.x + vectorInput.velocity.x, startPos.y + vectorInput.velocity.y);
-		drawList->AddLine(startPos, endPos, IM_COL32(0, 255, 0, 255), 2.0f);
-
-		// Draw arrowhead
-		ImVec2 direction = vectorInput.velocity;
-		float length = sqrtf(direction.x * direction.x + direction.y * direction.y);
-		if (length != 0.0f) {
-			direction.x /= length;
-			direction.y /= length;
-		}
-		float arrowSize = 10.0f;
-		ImVec2 arrowP1 = ImVec2(
-			endPos.x - direction.x * arrowSize - direction.y * (arrowSize / 2),
-			endPos.y - direction.y * arrowSize + direction.x * (arrowSize / 2)
-		);
-		ImVec2 arrowP2 = ImVec2(
-			endPos.x - direction.x * arrowSize + direction.y * (arrowSize / 2),
-			endPos.y - direction.y * arrowSize - direction.x * (arrowSize / 2)
-		);
-		drawList->AddTriangleFilled(endPos, arrowP1, arrowP2, IM_COL32(0, 255, 0, 255));
-	}
-
-	// Draw the dragging vector
-	if (vectorInput.isDragging) {
-		ImVec2 startPos = ImVec2(canvasPos.x + vectorInput.startPos.x, canvasPos.y + vectorInput.startPos.y);
-		ImVec2 currentPos = ImVec2(canvasPos.x + vectorInput.currentPos.x, canvasPos.y + vectorInput.currentPos.y);
-		drawList->AddLine(startPos, currentPos, IM_COL32(255, 0, 0, 255), 2.0f);
-
-		// Draw arrowhead
-		ImVec2 direction = ImVec2(vectorInput.currentPos.x - vectorInput.startPos.x,
-			vectorInput.currentPos.y - vectorInput.startPos.y);
-		float length = sqrtf(direction.x * direction.x + direction.y * direction.y);
-		if (length != 0.0f) {
-			direction.x /= length;
-			direction.y /= length;
-		}
-		float arrowSize = 10.0f;
-		ImVec2 endPos = currentPos;
-		ImVec2 arrowP1 = ImVec2(
-			endPos.x - direction.x * arrowSize - direction.y * (arrowSize / 2),
-			endPos.y - direction.y * arrowSize + direction.x * (arrowSize / 2)
-		);
-		ImVec2 arrowP2 = ImVec2(
-			endPos.x - direction.x * arrowSize + direction.y * (arrowSize / 2),
-			endPos.y - direction.y * arrowSize - direction.x * (arrowSize / 2)
-		);
-		drawList->AddTriangleFilled(endPos, arrowP1, arrowP2, IM_COL32(255, 0, 0, 255));
-	}
-
-	ImGui::End();
-
-	// Display vector data
-	if (!IsVectorZero(vectorInput.velocity)) {
-		ImGui::Begin("Vector Data");
-		ImGui::Text("Initial Velocity:");
-		ImGui::Text("X: %.2f", vectorInput.velocity.x);
-		ImGui::Text("Y: %.2f", vectorInput.velocity.y);
-		ImGui::End();
-	}
-
 }
 
 void Game::ControlCamera()
