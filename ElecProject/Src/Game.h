@@ -36,6 +36,6 @@ private:
 	static constexpr const wchar_t* WindowTitle = L"Rendering engine for Elec 1520";
 	static constexpr float NearClipping = 0.1f;
 	static constexpr float FarClipping = 830.0f;
-	static constexpr float Fov = 103.f; // degrees
+	static constexpr float Fov = 50.f; // degrees
 	bool isPhysicsEnabled = false;
 };

@@ -2,7 +2,7 @@
 #include <cassert>
 
 Planet::Planet(Graphics& gfx, float patternseed, DirectX::XMFLOAT3 pos /*= { 0,0,0 }*/, float radius /*= 1.0f*/)
-	: Sphere(gfx, patternseed, pos, {radius/2, radius/2, radius/2})
+	: Sphere(gfx, patternseed, pos, {radius, radius, radius})
 	, radius(radius)
 {
 
@@ -19,6 +19,11 @@ void Planet::SetMass(float newMass)
 	assert(newMass > 0);
 	_mass = newMass;
 	_invMass = 1.0f / _mass;
+}
+
+float Planet::getRadius() const
+{
+	return radius;
 }
 
 DirectX::CXMVECTOR Planet::GetVecVelocity() const
@@ -61,23 +66,22 @@ void Planet::SetVecPosition(DirectX::CXMVECTOR newPos)
 	SetPosition(p);
 }
 
-bool Planet::isRayIntersecting(DirectX::CXMVECTOR rayDir, DirectX::CXMVECTOR rayOrigin)
+bool Planet::isRayIntersecting(DirectX::XMVECTOR rayDir, DirectX::CXMVECTOR rayOrigin)
 {
-	namespace dx = DirectX;
-	// Do it in world space cause why not ig its already worlds least
-	// efficient program lol
-	auto vDirSq = dx::XMVector3LengthSq(rayDir);
-	float a = 0;
-	dx::XMStoreFloat(&a, vDirSq);
-	auto dirDotOrigin = dx::XMVector3Dot(rayDir, rayOrigin);
-	float b = 0;
-	dx::XMStoreFloat(&b, dirDotOrigin);
-	b *= 2.f;
-	auto vOriginSq = dx::XMVector3LengthSq(rayOrigin);
-	float c = 0;
-	dx::XMStoreFloat(&c, vOriginSq);
-	c -= radius * radius;
+	using namespace DirectX;
+	
+	XMVECTOR m = rayOrigin - GetVecPosition();
+	float b = XMVectorGetX(XMVector3Dot(m, rayDir));
+	float c = XMVectorGetX(XMVector3Dot(m, m)) - radius * radius;
 
-	float discriminant = b * b - 4 * a * c;
-	return discriminant >= 0;
+	// Exit if ray's origin is outside the sphere and ray is pointing away
+	if (c > 0.0f && b > 0.0f) return false;
+
+	float discriminant = b * b - c;
+
+	// No intersection
+	if (discriminant < 0.0f) return false;
+
+	// Ray intersects sphere
+	return true;
 }

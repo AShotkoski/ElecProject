@@ -21,6 +21,7 @@ public:
     // Physics Getters and Setters
     float GetMass() const;
     void SetMass(float newMass);
+    float getRadius() const;
     DirectX::CXMVECTOR GetVecVelocity() const;
     void SetVecVelocity(DirectX::CXMVECTOR newVelocity);
     DirectX::XMFLOAT3 GetVelocity() const;
@@ -29,7 +30,7 @@ public:
     DirectX::XMVECTOR calcAcceleration(DirectX::CXMVECTOR force) const;
     DirectX::XMVECTOR GetVecPosition() const;
     void SetVecPosition(DirectX::CXMVECTOR newPos);
-    bool isRayIntersecting(DirectX::CXMVECTOR rayDir, DirectX::CXMVECTOR rayOrigin);
+    bool isRayIntersecting(DirectX::XMVECTOR rayDir, DirectX::CXMVECTOR rayOrigin);
 private:
     // Physics attributes
     // units are all SI
