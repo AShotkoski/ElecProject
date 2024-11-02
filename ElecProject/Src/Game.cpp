@@ -53,6 +53,25 @@ void Game::UpdateLogic()
 	if (isPhysicsEnabled)
 		testPhys2();
 
+	// Do planet selection on mouse click
+	if (const auto& mEvent = wnd.mouse.GetEvent())
+	{ // mouse event
+		if (mEvent->GetType() == Mouse::Event::LeftDown)
+		{
+			// Convert pos to NDC
+			float xNDC = 2.f * (float)mEvent->GetX() / gfx.GetWidth() - 1.0f;
+			float yNDC = 1 - 2.f * (float)mEvent->GetY() / gfx.GetHeight();
+
+			auto optPlanet = DetectPlanetIntersection(xNDC, yNDC);
+			if (optPlanet)
+			{
+				Planet& planet = optPlanet->get();
+
+				planet.setScaling(0.5f);
+			}
+		}
+	}
+
 	ImGui::Begin("test");
 	ImGui::InputFloat("G", &Gravitational_Const, 0.0f, 0.0f, "%e");
 	ImGui::Checkbox("Physics", &isPhysicsEnabled);
@@ -171,6 +190,26 @@ void Game::testPhys2()
 		pPlanets[i]->SetVecPosition(planetStates[i].position);
 		pPlanets[i]->SetVecVelocity(planetStates[i].velocity);
 	}
+}
+
+std::optional<std::reference_wrapper<Planet>> Game::DetectPlanetIntersection(float ndcX, float ndcY)
+{
+	// Create the ray from the NDCs 
+	const auto ray = RayUtils::fromNDC(ndcX, ndcY, gfx.GetCamera().GetInvMatrix(), gfx.GetInvProjection());
+
+	std::optional<std::reference_wrapper<Planet>> intersected = std::nullopt;
+
+	// Loop over the planets and detect collision (this is not efficient but it wont bottleneck us)
+	for (const auto& p : pPlanets)
+	{
+		if (p->isRayIntersecting(ray))
+		{
+			intersected = std::ref(*p);
+			break;
+		}
+	}
+
+	return intersected;
 }
 
 void Game::ControlCamera()

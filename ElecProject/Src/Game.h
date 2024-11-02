@@ -3,6 +3,7 @@
 #include "FrameTimer.h"
 #include "Planet.h"
 #include <functional>
+#include <optional>
 
 class Game
 {
@@ -22,6 +23,10 @@ private:
 	void testPhys2();
 	float Gravitational_Const = 1.5e1;
 
+	// If the normalized device coords are on a planet, return that planet
+	// otherwise return an empty optional
+	std::optional<std::reference_wrapper<Planet>> DetectPlanetIntersection(float ndcX, float ndcY);
+
 private:
 	Window wnd;
 	Graphics& gfx;
@@ -36,6 +41,6 @@ private:
 	static constexpr const wchar_t* WindowTitle = L"Rendering engine for Elec 1520";
 	static constexpr float NearClipping = 0.1f;
 	static constexpr float FarClipping = 830.0f;
-	static constexpr float Fov = 50.f; // degrees
+	static constexpr float Fov = 95.f; // degrees
 	bool isPhysicsEnabled = false;
 };
