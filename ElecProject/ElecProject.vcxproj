@@ -177,6 +177,7 @@
     <ClInclude Include="Src\ImGuiManager.h" />
     <ClInclude Include="Src\PhysEngine.h" />
     <ClInclude Include="Src\Planet.h" />
+    <ClInclude Include="Src\Ray.h" />
     <ClInclude Include="Src\Sphere.h" />
     <ClInclude Include="Src\Camera.h" />
     <ClInclude Include="Src\Cube.h" />

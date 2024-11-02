@@ -3,6 +3,7 @@
 #include <d3dcompiler.h>
 #include "PhysEngine.h"
 #include "ImGuiCustom.h"
+#include "Ray.h"
 #include <random>
 
 namespace dx = DirectX;
@@ -77,47 +78,13 @@ void Game::DrawFrame()
 	float xNDC = outx / 100;
 	float yNDC = outy / 100;
 
-	// Unproject NDC to View Space
+	DirectX::XMMATRIX invProjMatrix = DirectX::XMMatrixInverse(nullptr, gfx.GetProjection()); // todo cache in gfx
 
-	DirectX::XMMATRIX invProjMatrix = DirectX::XMMatrixInverse(nullptr, gfx.GetProjection());
-	DirectX::XMVECTOR nearPoint = DirectX::XMVectorSet(xNDC, yNDC, 0.0f, 1.0f);
-	DirectX::XMVECTOR farPoint = DirectX::XMVectorSet(xNDC, yNDC, 1.0f, 1.0f);
+	auto ray = RayUtils::fromNDC(xNDC, yNDC, gfx.GetCamera().GetInvMatrix(), invProjMatrix);
+
+	ImGui::Text("Intersection? %d", pPlanets[0]->isRayIntersecting(ray.direction, ray.origin)); // todo change to ray
 	
-	nearPoint = dx::XMVector3TransformCoord(nearPoint, invProjMatrix);
-	farPoint = dx::XMVector3TransformCoord(farPoint, invProjMatrix);
 
-	// Transform from view space to world space
-	const auto invViewMatrix = gfx.GetCamera().GetInvMatrix();
-	nearPoint = dx::XMVector3TransformCoord(nearPoint, invViewMatrix);
-	farPoint = dx::XMVector3TransformCoord(farPoint, invViewMatrix);
-
-	
-	// Calculate World Coordinates Along the Ray
-	DirectX::XMFLOAT3 camPosFl = gfx.GetCamera().GetPosition();
-	DirectX::XMVECTOR camPos = DirectX::XMLoadFloat3(&camPosFl);	
-	
-	// Calculate the ray direction
-	dx::XMVECTOR rayDirWorld = dx::XMVector3Normalize(dx::XMVectorSubtract(farPoint, nearPoint));
-
-	float dist = 65.0f;
-	DirectX::XMVECTOR worldCoords = dx::XMVectorAdd(camPos, DirectX::XMVectorScale(rayDirWorld, dist));
-
-	ImGui::Text("Intersection? %d", pPlanets[0]->isRayIntersecting(rayDirWorld, nearPoint));
-	pPlanets[1]->SetVecPosition(worldCoords);
-	
-	// Debug output :( 
-	auto vecToFl = [](const dx::XMVECTOR& in) -> dx::XMFLOAT3
-		{
-			dx::XMFLOAT3 out;
-			dx::XMStoreFloat3(&out, in);
-			return out;
-		};
-	ImGui::Text("Camera pos (%f,%f,%f)", camPosFl.x, camPosFl.y, camPosFl.z);
-	auto _raydir = vecToFl(rayDirWorld);
-	ImGui::Text("Ray Dir (%f, %f, %f)", _raydir.x, _raydir.y, _raydir.z);
-	auto _plPos = pPlanets[0]->GetPosition();
-	ImGui::Text("Sphere pos (%f, %f, %f)", _plPos.x, _plPos.y, _plPos.z);
-	ImGui::Text("Sphere radius %f", pPlanets[0]->getRadius());
 	ImGui::End();
 }
 
