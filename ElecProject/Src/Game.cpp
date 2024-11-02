@@ -69,21 +69,11 @@ void Game::DrawFrame()
 	wnd.GFX().GetCamera().spawnControlWindow();
 	//ImGui::ShowDemoWindow();
 
-	ImGui::Begin("Vec2d selection");
-	float outx, outy;
-	ImGuiCustom::Vec2DInput("Test input ", &outx, &outy);
+	//ImGui::Begin("Vec2d selection");
+	//float outx, outy;
+	//ImGuiCustom::Vec2DInput("Test input ", &outx, &outy);
 
-	// Convert to NDC
-
-	float xNDC = outx / 100;
-	float yNDC = outy / 100;
-
-	auto ray = RayUtils::fromNDC(xNDC, yNDC, gfx.GetCamera().GetInvMatrix(), gfx.GetInvProjection());
-
-	ImGui::Text("Intersection? %d", pPlanets[0]->isRayIntersecting(ray));
-	
-
-	ImGui::End();
+	//ImGui::End();
 }
 
 void Game::testPhys2()
