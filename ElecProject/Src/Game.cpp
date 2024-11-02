@@ -82,7 +82,7 @@ void Game::DrawFrame()
 
 	auto ray = RayUtils::fromNDC(xNDC, yNDC, gfx.GetCamera().GetInvMatrix(), invProjMatrix);
 
-	ImGui::Text("Intersection? %d", pPlanets[0]->isRayIntersecting(ray.direction, ray.origin)); // todo change to ray
+	ImGui::Text("Intersection? %d", pPlanets[0]->isRayIntersecting(ray));
 	
 
 	ImGui::End();

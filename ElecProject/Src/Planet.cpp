@@ -1,4 +1,5 @@
 #include "Planet.h"
+#include "Ray.h"
 #include <cassert>
 
 Planet::Planet(Graphics& gfx, float patternseed, DirectX::XMFLOAT3 pos /*= { 0,0,0 }*/, float radius /*= 1.0f*/)
@@ -66,12 +67,12 @@ void Planet::SetVecPosition(DirectX::CXMVECTOR newPos)
 	SetPosition(p);
 }
 
-bool Planet::isRayIntersecting(DirectX::XMVECTOR rayDir, DirectX::CXMVECTOR rayOrigin)
+bool Planet::isRayIntersecting(const Ray& ray) const
 {
 	using namespace DirectX;
 	
-	XMVECTOR m = rayOrigin - GetVecPosition();
-	float b = XMVectorGetX(XMVector3Dot(m, rayDir));
+	XMVECTOR m = ray.origin - GetVecPosition();
+	float b = XMVectorGetX(XMVector3Dot(m, ray.direction));
 	float c = XMVectorGetX(XMVector3Dot(m, m)) - radius * radius;
 
 	// Exit if ray's origin is outside the sphere and ray is pointing away

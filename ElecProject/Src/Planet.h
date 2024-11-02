@@ -8,6 +8,9 @@
 #pragma once
 #include "Sphere.h"
 
+// fwd decl
+struct Ray;
+
 class Planet :
     public Sphere
 {
@@ -30,7 +33,7 @@ public:
     DirectX::XMVECTOR calcAcceleration(DirectX::CXMVECTOR force) const;
     DirectX::XMVECTOR GetVecPosition() const;
     void SetVecPosition(DirectX::CXMVECTOR newPos);
-    bool isRayIntersecting(DirectX::XMVECTOR rayDir, DirectX::CXMVECTOR rayOrigin);
+    bool isRayIntersecting(const Ray& ray) const;
 private:
     // Physics attributes
     // units are all SI
