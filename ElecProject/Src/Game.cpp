@@ -78,9 +78,7 @@ void Game::DrawFrame()
 	float xNDC = outx / 100;
 	float yNDC = outy / 100;
 
-	DirectX::XMMATRIX invProjMatrix = DirectX::XMMatrixInverse(nullptr, gfx.GetProjection()); // todo cache in gfx
-
-	auto ray = RayUtils::fromNDC(xNDC, yNDC, gfx.GetCamera().GetInvMatrix(), invProjMatrix);
+	auto ray = RayUtils::fromNDC(xNDC, yNDC, gfx.GetCamera().GetInvMatrix(), gfx.GetInvProjection());
 
 	ImGui::Text("Intersection? %d", pPlanets[0]->isRayIntersecting(ray));
 	

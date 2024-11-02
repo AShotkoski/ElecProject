@@ -37,6 +37,7 @@ public:
 	UINT GetHeight() const;
 	void SetProjection(DirectX::FXMMATRIX proj) noexcept;
 	DirectX::XMMATRIX GetProjection() const noexcept;
+	DirectX::XMMATRIX GetInvProjection() const noexcept;
 	ID3D11Device* pGetDevice() const;
 	ID3D11DeviceContext* pGetContext() const;
 	ID3D11RenderTargetView* pGetRTV() const;
@@ -46,6 +47,7 @@ public:
 
 private:
 	DirectX::XMMATRIX projection;
+	DirectX::XMMATRIX invProjection;
 	Camera camera;
 	// Dimensions of client area
 	UINT Width;

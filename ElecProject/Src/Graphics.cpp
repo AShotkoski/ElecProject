@@ -16,8 +16,9 @@ namespace dx = DirectX;
 Graphics::Graphics(HWND hWnd)
 	:
 	projection(DirectX::XMMatrixIdentity())
+	, invProjection(DirectX::XMMatrixIdentity())
 {
-	// Used for erro checking
+	// Used for error checking
 	HRESULT hr;
 
 	// Get window dimensions
@@ -190,11 +191,19 @@ UINT Graphics::GetHeight() const
 void Graphics::SetProjection(DirectX::FXMMATRIX proj) noexcept
 {
 	projection = proj;
+	// Update inv projection
+	invProjection = dx::XMMatrixInverse(nullptr, proj);
 }
 
 DirectX::XMMATRIX Graphics::GetProjection() const noexcept
 {
 	return projection;
+}
+
+DirectX::XMMATRIX Graphics::GetInvProjection() const noexcept
+{
+	return invProjection;
+
 }
 
 ID3D11Device* Graphics::pGetDevice() const
