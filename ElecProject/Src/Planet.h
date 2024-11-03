@@ -21,6 +21,8 @@ public:
         DirectX::XMFLOAT3 pos = { 0,0,0 },
         float radius = 1.0f);
 
+    virtual void Draw(Graphics& gfx) override;
+
     // Physics Getters and Setters
     float GetMass() const;
     void SetMass(float newMass);
@@ -34,6 +36,12 @@ public:
     DirectX::XMVECTOR GetVecPosition() const;
     void SetVecPosition(DirectX::CXMVECTOR newPos);
     bool isRayIntersecting(const Ray& ray) const;
+
+    void EnableControlWindow();
+    void DrawControlWindow();
+    void DisableControlWindow();
+    bool isControlWindowEnabled() const;
+    void ToggleControlWindow();
 private:
     // Physics attributes
     // units are all SI
@@ -42,5 +50,6 @@ private:
     DirectX::XMVECTOR _vel = DirectX::XMVectorZero();
     const float radius;
 
+    bool ControlWindowEnabled = false;
 };
 

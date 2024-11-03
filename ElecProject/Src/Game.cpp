@@ -67,7 +67,7 @@ void Game::UpdateLogic()
 			{
 				Planet& planet = optPlanet->get();
 
-				planet.setScaling(0.5f);
+				planet.ToggleControlWindow();
 			}
 		}
 	}

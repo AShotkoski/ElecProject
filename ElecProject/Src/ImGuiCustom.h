@@ -1,5 +1,6 @@
 #pragma once
 #include "ThirdParty/ImGui/imgui.h"
+#include <algorithm>
 #include <map>
 #include <cmath>
 
@@ -7,7 +8,7 @@ namespace ImGuiCustom
 {
 
 	// Creates a box that allows the user to draw a vector and outputs the resultant vector
-	bool Vec2DInput(const char* label, float* out_x, float* out_y, const ImVec2& canvas_size = ImVec2(200, 200))
+	static bool Vec2DInput(const char* label, float* out_x, float* out_y, const ImVec2& canvas_size = ImVec2(200, 200))
 	{
 		// Ensure a unique ID for each widget instance
 		ImGui::PushID(label);

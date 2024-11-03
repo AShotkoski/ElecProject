@@ -11,7 +11,7 @@ public:
 		DirectX::XMFLOAT3 pos = { 0,0,0 },
 		DirectX::XMFLOAT3 scale = { 1,1,1 },
 		DirectX::FXMVECTOR rotation = DirectX::XMQuaternionIdentity());
-	void Draw(Graphics& gfx);
+	virtual void Draw(Graphics& gfx);
 
 	void SetPosition(DirectX::XMFLOAT3 newPos);
 	void setScaling(DirectX::XMFLOAT3 newScaling);
@@ -33,12 +33,16 @@ private:
 	{
 		DirectX::XMFLOAT3 position;
 	};
+	static UINT indCount;
+protected:
 	// Storing all these properties is pretty wasteful since we have a CB
 	// embedded in the class, but it shouldn't bottleneck anything 
 	DirectX::XMFLOAT3 position;
 	DirectX::XMFLOAT3 scaling; // (x factor, y factor, z factor)
-	DirectX::XMVECTOR rotation; // quaternion for rotation 
-	static UINT indCount;
+	DirectX::XMVECTOR rotation; // quaternion for rotation 	
+
+	// Update the const buffer based on internal cube params
+	void updateCB();
 private:
 	// Instance specific resource
 	Microsoft::WRL::ComPtr<ID3D11Buffer> pConstBuffer;
@@ -56,8 +60,7 @@ private:
 	// returns index count
 	static UINT InitSharedResources(Graphics& gfx);
 
-	// Update the const buffer based on internal cube params
-	void updateCB();
+	
 
 	// Helper to generate the geometry of the sphere
 	static void GenerateGeometry(size_t subdivisions, std::vector<Sphere::Vertex>& out_vertices, std::vector<unsigned short>& out_indices);

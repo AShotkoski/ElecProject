@@ -1,5 +1,6 @@
 #include "Planet.h"
 #include "Ray.h"
+#include "ImGuiCustom.h"
 #include <cassert>
 
 Planet::Planet(Graphics& gfx, float patternseed, DirectX::XMFLOAT3 pos /*= { 0,0,0 }*/, float radius /*= 1.0f*/)
@@ -7,6 +8,13 @@ Planet::Planet(Graphics& gfx, float patternseed, DirectX::XMFLOAT3 pos /*= { 0,0
 	, radius(radius)
 {
 
+}
+
+void Planet::Draw(Graphics& gfx)
+{
+	Sphere::Draw(gfx);
+	if (ControlWindowEnabled)
+		DrawControlWindow();
 }
 
 // Returns mass in KG
@@ -85,4 +93,46 @@ bool Planet::isRayIntersecting(const Ray& ray) const
 
 	// Ray intersects sphere
 	return true;
+}
+
+void Planet::EnableControlWindow()
+{
+	ControlWindowEnabled = true;
+}
+
+void Planet::DrawControlWindow()
+{
+	bool outdatedProperties = false;
+	
+	ImGui::Begin(std::to_string(reinterpret_cast<uintptr_t>(this)).c_str(), nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
+
+	// Position
+	outdatedProperties |= ImGui::DragFloat3("Position", &position.x, 0.25f);
+	// Mass
+	ImGui::InputFloat("Mass", &_mass, 0, 0, "%e");
+	// Velocity
+	auto vel = GetVelocity();
+	if (ImGui::DragFloat3("Velocity", &vel.x, 0.25f))
+	{
+		SetVelocity(vel);
+	}
+	ImGui::End();
+
+	if (outdatedProperties)
+		Sphere::updateCB();
+}
+
+void Planet::DisableControlWindow()
+{
+	ControlWindowEnabled = false;
+}
+
+bool Planet::isControlWindowEnabled() const
+{
+	return ControlWindowEnabled;
+}
+
+void Planet::ToggleControlWindow()
+{
+	ControlWindowEnabled = !ControlWindowEnabled;
 }
