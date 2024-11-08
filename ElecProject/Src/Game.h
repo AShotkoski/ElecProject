@@ -18,7 +18,7 @@ private:
 	void DrawFrame();
 	// Wraps the if's for controlling the camera
 	void ControlCamera();
-	void attachplanettemp(float distaway);
+	void AttachPlanetToCursor();
 
 	// This function will be reworked at some point
 	void testPhys2();

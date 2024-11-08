@@ -68,7 +68,7 @@ void Game::UpdateLogic()
 				controlledPlanetDistAway += 5.f;
 			}
 		}
-		attachplanettemp(controlledPlanetDistAway);
+		AttachPlanetToCursor();
 	}
 
 	while (const auto& mEvent = wnd.mouse.GetEvent())
@@ -115,11 +115,23 @@ void Game::UpdateLogic()
 		
 	}
 
-	
-
-	ImGui::Begin("test");
+	ImGui::Begin("Game control", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 	ImGui::InputFloat("G", &Gravitational_Const, 0.0f, 0.0f, "%e");
 	ImGui::Checkbox("Physics", &isPhysicsEnabled);
+	ImGui::NewLine();
+	static float newPlanetMass = 1.f;
+	static float newPlanetRadius = 10.f;
+	ImGui::DragFloat("New Planet Mass", &newPlanetMass, 0.5f);
+	ImGui::DragFloat("New Planet Radius", &newPlanetRadius, 0.1f);
+	if (ImGui::Button("New Planet"))
+	{
+		auto midRay = RayUtils::fromNDC(0, 0, gfx.GetCamera().GetInvMatrix(), gfx.GetInvProjection());
+		float newPlanetDistAway = newPlanetRadius * 2.f;
+		auto newPlanetPos = dx::XMVectorAdd(midRay.origin, dx::XMVectorScale(midRay.direction, newPlanetDistAway));
+		pPlanets.emplace_back(std::make_unique<Planet>(gfx, (float)rand(), dx::XMFLOAT3{0,0,0}, newPlanetRadius));
+		pPlanets.back()->SetVecPosition(newPlanetPos);
+		pPlanets.back()->SetMass(newPlanetMass);
+	}
 	ImGui::End();
 }
 
@@ -332,7 +344,7 @@ void Game::ControlCamera()
 	}
 }
 
-void Game::attachplanettemp(float distaway)
+void Game::AttachPlanetToCursor()
 {
 	using namespace DirectX;
 	if (!controlledPlanet)
