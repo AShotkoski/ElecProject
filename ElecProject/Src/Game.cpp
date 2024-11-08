@@ -115,6 +115,30 @@ void Game::UpdateLogic()
 		
 	}
 
+	// Keyboard Controls
+	while (const auto& kbdEvent = wnd.kbd.GetEvent())
+	{
+		if (kbdEvent->GetType() == Keyboard::Event::Keydown)
+		{
+			float xNDC = 2.f * (float)wnd.mouse.GetX() / gfx.GetWidth() - 1.0f;
+			float yNDC = 1.0f - 2.f * (float)wnd.mouse.GetY() / gfx.GetHeight();
+			auto optPlanet = DetectPlanetIntersection(xNDC, yNDC);
+			if (optPlanet)
+			{
+				Planet& planet = optPlanet->get();
+
+				// handle key being pressed while mouse is over a planet
+				switch (kbdEvent->GetVirtualKey())
+				{
+				case 'R':
+					planet.SetVecVelocity(dx::XMVectorZero());
+					break;
+				}
+
+			}
+		}
+	}
+
 	ImGui::Begin("Game control", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 	ImGui::InputFloat("G", &Gravitational_Const, 0.0f, 0.0f, "%e");
 	ImGui::Checkbox("Physics", &isPhysicsEnabled);
