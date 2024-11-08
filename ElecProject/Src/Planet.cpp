@@ -108,7 +108,7 @@ void Planet::DrawControlWindow()
 	title.append("##");
 	title.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
 
-	ImGui::Begin(title.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+	ImGui::Begin(title.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize );
 
 	// Position
 	outdatedProperties |= ImGui::DragFloat3("Position", &position.x, 0.25f);

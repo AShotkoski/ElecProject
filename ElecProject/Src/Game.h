@@ -15,6 +15,9 @@ public:
 	void Go();
 private:
 	void UpdateLogic();
+
+	void SpawnControlWindow();
+
 	void DrawFrame();
 	// Wraps the if's for controlling the camera
 	void ControlCamera();

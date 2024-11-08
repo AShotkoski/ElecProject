@@ -139,6 +139,11 @@ void Game::UpdateLogic()
 		}
 	}
 
+	SpawnControlWindow();
+}
+
+void Game::SpawnControlWindow()
+{
 	ImGui::Begin("Game control", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 	ImGui::InputFloat("G", &Gravitational_Const, 0.0f, 0.0f, "%e");
 	ImGui::Checkbox("Physics", &isPhysicsEnabled);
@@ -152,7 +157,7 @@ void Game::UpdateLogic()
 		auto midRay = RayUtils::fromNDC(0, 0, gfx.GetCamera().GetInvMatrix(), gfx.GetInvProjection());
 		float newPlanetDistAway = newPlanetRadius * 2.f;
 		auto newPlanetPos = dx::XMVectorAdd(midRay.origin, dx::XMVectorScale(midRay.direction, newPlanetDistAway));
-		pPlanets.emplace_back(std::make_unique<Planet>(gfx, (float)rand(), dx::XMFLOAT3{0,0,0}, newPlanetRadius));
+		pPlanets.emplace_back(std::make_unique<Planet>(gfx, (float)rand(), dx::XMFLOAT3{ 0,0,0 }, newPlanetRadius));
 		pPlanets.back()->SetVecPosition(newPlanetPos);
 		pPlanets.back()->SetMass(newPlanetMass);
 	}
