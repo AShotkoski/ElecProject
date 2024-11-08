@@ -62,6 +62,14 @@ std::optional<Mouse::Event> Mouse::GetEvent()
 	return front;
 }
 
+std::optional<Mouse::Event> Mouse::PeekEvent()
+{
+	if (eventQueue.empty())
+		return std::nullopt;
+
+	return eventQueue.front();
+}
+
 bool Mouse::LeftIsPressed() const
 {
 	return leftDown;

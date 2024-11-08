@@ -47,7 +47,10 @@ public:
 	int GetX() const;
 	int GetY() const;
 	std::pair<int, int> GetPos() const;
+	// Return the latest event and remove it from the event queue
 	std::optional<Event> GetEvent();
+	// Return the latest event without removing it from the event queue
+	std::optional<Event> PeekEvent();
 	bool LeftIsPressed() const;
 	bool RightIsPressed() const;
 	bool MiddleIsPressed() const;
