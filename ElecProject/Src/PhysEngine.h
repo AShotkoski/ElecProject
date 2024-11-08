@@ -55,8 +55,10 @@ namespace phys
 				XMVECTOR distSqVec = XMVector3Length(r); // This could be sped up
 				float distSq;
 				XMStoreFloat(&distSq, distSqVec);
-				// Skip 0 dist cases to avoid div0
-				if (distSq == 0)
+				
+				// Add a clamp condition to set a minimum distance to avoid ultra high forces
+				constexpr const float distSqMin = 2.5e-5;
+				if (distSq < distSqMin)
 					continue;
 
 				XMVECTOR rHat = XMVector3Normalize(r); // Could be sped up
