@@ -73,53 +73,7 @@ namespace phys
 		float G;
 		float mass;
 	};
-	class AltGravForce : public Force
-	{
-	public:
-		AltGravForce(const std::vector<State>& affectingObjects, 
-			const std::vector<float>& affectingObjMasses, 
-			float G, float mass)
-			:
-			others(affectingObjects)
-			, otherMasses(affectingObjMasses)
-			, G(G)
-			, mass(mass)
-		{
-		}
-
-		DirectX::XMVECTOR compute(const State& state) override
-		{
-			using namespace DirectX;
-			XMVECTOR netF = XMVectorZero();
-			for (size_t i = 0; i < others.size(); ++i)
-			{
-				const auto& s = others[i];
-				float sMass = otherMasses[i];
-
-				XMVECTOR r = XMVectorSubtract(s.position, state.position); // displacement
-				XMVECTOR distSqVec = XMVector3Length(r); // This could be sped up
-				float distSq;
-				XMStoreFloat(&distSq, distSqVec);
-				// Skip 0 dist cases to avoid div0
-				if (distSq == 0)
-					continue;
-
-				XMVECTOR rHat = XMVector3Normalize(r); // Could be sped up
-
-
-				float magF = G * mass * sMass / (exp(distSq*sin(distSq)*sin(distSq)* cos(distSq)* cos(distSq)));
-				XMVECTOR forceVec = XMVectorScale(rHat, magF);
-				netF = XMVectorAdd(netF, forceVec);
-			}
-			return netF;
-		}
-
-	private:
-		const std::vector<State>& others; // The other objects that affect this force
-		const std::vector<float>& otherMasses; // The indexed list of masses of the other objects
-		float G;
-		float mass;
-	};
+	
 
 	// Generic integration function given a state
 	// (I could add a time variable here if for some reason I don't

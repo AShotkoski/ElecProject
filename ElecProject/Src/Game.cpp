@@ -22,14 +22,15 @@ Game::Game()
 	);
 
 	// Add planets
-	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.f, dx::XMFLOAT3{ 0,0,0 }));
-	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.5f, dx::XMFLOAT3{ -20,0,10 }, 10.f));
-	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 1.25f, dx::XMFLOAT3{ -10,10,00 }, 10.f));
+	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.f, dx::XMFLOAT3{ 0,0,0 }, 20.f));
+	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.5f, dx::XMFLOAT3{ 100,0,0 }, 10.0f));
 
-	pPlanets[0]->SetVelocity({ -1, 0, 1 });
-	pPlanets[0]->SetMass(1800);
-	pPlanets[1]->SetMass(1000);
-	pPlanets[2]->SetMass(1000);
+	pPlanets[0]->SetVelocity({ 0, 0,0 });
+	pPlanets[1]->SetVelocity({ 0, 1,0 });
+
+	pPlanets[0]->SetMass(10000);
+	pPlanets[1]->SetMass(1);
+	//pPlanets[2]->SetMass(1000);
 }
 
 Game::~Game()
