@@ -18,6 +18,7 @@ private:
 	void DrawFrame();
 	// Wraps the if's for controlling the camera
 	void ControlCamera();
+	void attachplanettemp(float distaway);
 
 	// This function will be reworked at some point
 	void testPhys2();
@@ -32,9 +33,11 @@ private:
 	Graphics& gfx;
 	FrameTimer ft;
 	std::vector<std::unique_ptr<Planet>> pPlanets;
-
 private:
 	float dt = 0;
+	bool controllingPlanet = false;
+	Planet* controlledPlanet = nullptr;
+	float controlledPlanetDistAway = 12.f;
 private:
 	static constexpr UINT ScreenWidth = 1272u;
 	static constexpr UINT ScreenHeight = 954u;

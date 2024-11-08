@@ -22,7 +22,7 @@ Game::Game()
 	);
 
 	// Add planets
-	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.f, dx::XMFLOAT3{ 0,0,0 }, 20.f));
+	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.f, dx::XMFLOAT3{ 0,0,0 }, 8.f));
 	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.5f, dx::XMFLOAT3{ 100,0,0 }, 10.0f));
 
 	pPlanets[0]->SetVelocity({ 0, 0,0 });
@@ -54,14 +54,55 @@ void Game::UpdateLogic()
 	if (isPhysicsEnabled)
 		testPhys2();
 
-	// Do planet selection on mouse click
-	if (const auto& mEvent = wnd.mouse.GetEvent())
+	// Move planets
+	if (controllingPlanet)
+	{
+		if (const auto mEvent = wnd.mouse.PeekEvent())
+		{
+			if (mEvent->GetType() == Mouse::Event::ScrollDown)
+			{
+				controlledPlanetDistAway -= 5.f;
+			}
+			if (mEvent->GetType() == Mouse::Event::ScrollUp)
+			{
+				controlledPlanetDistAway += 5.f;
+			}
+		}
+		attachplanettemp(controlledPlanetDistAway);
+	}
+
+	while (const auto& mEvent = wnd.mouse.GetEvent())
 	{ // mouse event
+		if (mEvent->GetType() == Mouse::Event::LeftDown)
+		{
+			float xNDC = 2.f * (float)mEvent->GetX() / gfx.GetWidth() - 1.0f;
+			float yNDC = 1.0f - 2.f * (float)mEvent->GetY() / gfx.GetHeight();
+			auto optPlanet = DetectPlanetIntersection(xNDC, yNDC);
+			if (optPlanet)
+			{
+				Planet& planet = optPlanet->get();
+
+				controllingPlanet = true;
+				controlledPlanet = &planet;
+
+				// set the dist away
+				auto cpos = gfx.GetCamera().GetPosition();
+				controlledPlanetDistAway = dx::XMVectorGetX(dx::XMVector3LengthEst(dx::XMVectorSubtract(dx::XMLoadFloat3(&cpos), planet.GetVecPosition())));
+			}
+		}
 		if (mEvent->GetType() == Mouse::Event::LeftUp)
+		{
+			if (controllingPlanet)
+			{
+				controllingPlanet = false;
+				controlledPlanet = nullptr;
+			}
+		}
+		if (mEvent->GetType() == Mouse::Event::RightDown)
 		{
 			// Convert pos to NDC
 			float xNDC = 2.f * (float)mEvent->GetX() / gfx.GetWidth() - 1.0f;
-			float yNDC = 1 - 2.f * (float)mEvent->GetY() / gfx.GetHeight();
+			float yNDC = 1.0f - 2.f * (float)mEvent->GetY() / gfx.GetHeight();
 
 			auto optPlanet = DetectPlanetIntersection(xNDC, yNDC);
 			if (optPlanet)
@@ -71,7 +112,10 @@ void Game::UpdateLogic()
 				planet.ToggleControlWindow();
 			}
 		}
+		
 	}
+
+	
 
 	ImGui::Begin("test");
 	ImGui::InputFloat("G", &Gravitational_Const, 0.0f, 0.0f, "%e");
@@ -287,3 +331,15 @@ void Game::ControlCamera()
 		gfx.GetCamera().UpdatePosition(dCampos, dt);
 	}
 }
+
+void Game::attachplanettemp(float distaway)
+{
+	using namespace DirectX;
+	if (!controlledPlanet)
+		return;
+	float xNDC = 2.f * (float)wnd.mouse.GetX() / gfx.GetWidth() - 1.0f;
+	float yNDC = 1.0f - 2.f * (float)wnd.mouse.GetY() / gfx.GetHeight();
+	auto ray = RayUtils::fromNDC(xNDC, yNDC, gfx.GetCamera().GetInvMatrix(), gfx.GetInvProjection());
+	controlledPlanet->SetVecPosition(ray.origin + XMVectorScale(ray.direction, controlledPlanetDistAway));
+}
+
