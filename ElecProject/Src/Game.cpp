@@ -57,7 +57,7 @@ void Game::UpdateLogic()
 	// Do planet selection on mouse click
 	if (const auto& mEvent = wnd.mouse.GetEvent())
 	{ // mouse event
-		if (mEvent->GetType() == Mouse::Event::LeftDown)
+		if (mEvent->GetType() == Mouse::Event::LeftUp)
 		{
 			// Convert pos to NDC
 			float xNDC = 2.f * (float)mEvent->GetX() / gfx.GetWidth() - 1.0f;

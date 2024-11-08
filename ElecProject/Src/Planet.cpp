@@ -104,7 +104,11 @@ void Planet::DrawControlWindow()
 {
 	bool outdatedProperties = false;
 	
-	ImGui::Begin(std::to_string(reinterpret_cast<uintptr_t>(this)).c_str(), nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
+	std::string title = "Planet";
+	title.append("##");
+	title.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
+
+	ImGui::Begin(title.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
 	// Position
 	outdatedProperties |= ImGui::DragFloat3("Position", &position.x, 0.25f);
