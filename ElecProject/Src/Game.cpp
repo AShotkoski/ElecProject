@@ -26,9 +26,9 @@ Game::Game()
 	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.5f, dx::XMFLOAT3{ 100,0,0 }, 10.0f));
 
 	pPlanets[0]->SetVelocity({ 0, 0,0 });
-	pPlanets[1]->SetVelocity({ 0, 1,0 });
+	pPlanets[1]->SetVelocity({ 0, 0,0 });
 
-	pPlanets[0]->SetMass(10000);
+	pPlanets[0]->SetMass(1e3);
 	pPlanets[1]->SetMass(1);
 	//pPlanets[2]->SetMass(1000);
 }
@@ -144,8 +144,17 @@ void Game::testPhys2()
 		// Acceleration lambda for integration
 		auto computeAccel = [&](const phys::State& s)
 			{
-				DirectX::XMVECTOR force = agf.compute(s);
-				return dx::XMVectorScale(force, 1.0f / planetMasses[i]);
+				DirectX::XMVECTOR forceV = agf.compute(s);
+				auto accelV = dx::XMVectorScale(forceV, 1.0f / planetMasses[i]);
+				// Clamp Acceleration
+				constexpr const float maxAccel = 1e6;
+				float magAccel = dx::XMVectorGetX(dx::XMVector3LengthEst(accelV));
+				if (magAccel > maxAccel)
+				{
+					auto normAccel = dx::XMVector3Normalize(accelV);
+					accelV = dx::XMVectorScale(normAccel, maxAccel);
+				}
+				return accelV;
 			};
 		// Acceleration lambda alt integration
 		auto computeAccelBox = [&](const phys::State& s)

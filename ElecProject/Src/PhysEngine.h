@@ -57,7 +57,7 @@ namespace phys
 				XMStoreFloat(&distSq, distSqVec);
 				
 				// Add a clamp condition to set a minimum distance to avoid ultra high forces
-				constexpr const float distSqMin = 2.5e-5;
+				constexpr const float distSqMin = 2.5e-7;
 				if (distSq < distSqMin)
 					continue;
 
