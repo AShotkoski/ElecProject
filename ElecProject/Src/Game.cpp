@@ -133,6 +133,10 @@ void Game::UpdateLogic()
 				case 'R':
 					planet.SetVecVelocity(dx::XMVectorZero());
 					break;
+				case VK_DELETE:
+					auto it = std::find_if(pPlanets.begin(), pPlanets.end(), [&planet](const std::unique_ptr<Planet>& pl) {return pl.get() == &planet; });
+					pPlanets.erase(it);
+					break;
 				}
 
 			}
@@ -147,6 +151,7 @@ void Game::SpawnControlWindow()
 	ImGui::Begin("Game control", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 	ImGui::InputFloat("G", &Gravitational_Const, 0.0f, 0.0f, "%e");
 	ImGui::Checkbox("Physics", &isPhysicsEnabled);
+	ImGui::InputFloat("Bounding Sphere Radius", &boundingSphereSize);
 	ImGui::NewLine();
 	static float newPlanetMass = 1.f;
 	static float newPlanetRadius = 10.f;
@@ -245,17 +250,16 @@ void Game::testPhys2()
 		auto computeAccelBox = [&](const phys::State& s)
 			{
 				DirectX::XMVECTOR accel = dx::XMVectorZero();
-				// Define the bounding sphere radius
-				const float maxR = 50.0f;
+				
 
 				// Compute the distance from the origin to the object
 				float dist;
 				dx::XMStoreFloat(&dist, dx::XMVector3Length(s.position));
 
-				if (dist > maxR)
+				if (dist > boundingSphereSize)
 				{
 					// Calculate the penetration depth
-					float penetrationDepth = dist - maxR;
+					float penetrationDepth = dist - boundingSphereSize;
 
 					// Compute the normal vector pointing towards the center of the sphere
 					DirectX::XMVECTOR normal = dx::XMVector3Normalize(s.position);

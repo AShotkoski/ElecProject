@@ -26,6 +26,7 @@ private:
 	// This function will be reworked at some point
 	void testPhys2();
 	float Gravitational_Const = 1e-2;
+	float boundingSphereSize = 50.f;
 
 	// If the normalized device coords are on a planet, return that planet
 	// otherwise return an empty optional
