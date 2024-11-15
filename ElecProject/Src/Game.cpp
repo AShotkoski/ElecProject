@@ -149,23 +149,44 @@ void Game::UpdateLogic()
 void Game::SpawnControlWindow()
 {
 	ImGui::Begin("Game control", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+	ImGui::TextColored({ 1,0,0,1 }, "There are %d planets", pPlanets.size());
 	ImGui::InputFloat("G", &Gravitational_Const, 0.0f, 0.0f, "%e");
 	ImGui::Checkbox("Physics", &isPhysicsEnabled);
 	ImGui::InputFloat("Bounding Sphere Radius", &boundingSphereSize);
-	ImGui::NewLine();
-	static float newPlanetMass = 1.f;
-	static float newPlanetRadius = 10.f;
-	ImGui::DragFloat("New Planet Mass", &newPlanetMass, 0.5f);
-	ImGui::DragFloat("New Planet Radius", &newPlanetRadius, 0.1f);
-	if (ImGui::Button("New Planet"))
+
+	if (ImGui::CollapsingHeader("New Planet"))
 	{
-		auto midRay = RayUtils::fromNDC(0, 0, gfx.GetCamera().GetInvMatrix(), gfx.GetInvProjection());
-		float newPlanetDistAway = newPlanetRadius * 2.f;
-		auto newPlanetPos = dx::XMVectorAdd(midRay.origin, dx::XMVectorScale(midRay.direction, newPlanetDistAway));
-		pPlanets.emplace_back(std::make_unique<Planet>(gfx, (float)rand(), dx::XMFLOAT3{ 0,0,0 }, newPlanetRadius));
-		pPlanets.back()->SetVecPosition(newPlanetPos);
-		pPlanets.back()->SetMass(newPlanetMass);
+		static float newPlanetMass = 1.f;
+		static float newPlanetRadius = 10.f;
+		ImGui::DragFloat("New Planet Mass", &newPlanetMass, 0.5f);
+		ImGui::DragFloat("New Planet Radius", &newPlanetRadius, 0.1f);
+		if (ImGui::Button("New Planet"))
+		{
+			auto midRay = RayUtils::fromNDC(0, 0, gfx.GetCamera().GetInvMatrix(), gfx.GetInvProjection());
+			float newPlanetDistAway = newPlanetRadius * 2.f;
+			auto newPlanetPos = dx::XMVectorAdd(midRay.origin, dx::XMVectorScale(midRay.direction, newPlanetDistAway));
+			pPlanets.emplace_back(std::make_unique<Planet>(gfx, (float)rand(), dx::XMFLOAT3{ 0,0,0 }, newPlanetRadius));
+			pPlanets.back()->SetVecPosition(newPlanetPos);
+			pPlanets.back()->SetMass(newPlanetMass);
+		}
 	}
+
+	if (ImGui::CollapsingHeader("Planet Grid"))
+	{
+		static float planetGridSpacing = 10.5f;
+		static float planetGridRadius = 2.0f;
+		static float planetGridMass = 1e-5f;
+
+		ImGui::InputFloat("Spacing", &planetGridSpacing);
+		ImGui::InputFloat("Radius", &planetGridRadius);
+		ImGui::InputFloat("Mass", &planetGridMass);
+
+		if (ImGui::Button("Create planet grid"))
+		{
+			CreatePlanetGrid(planetGridRadius, planetGridSpacing, planetGridMass);
+		}
+	}
+	
 	ImGui::End();
 }
 
@@ -386,5 +407,44 @@ void Game::AttachPlanetToCursor()
 	float yNDC = 1.0f - 2.f * (float)wnd.mouse.GetY() / gfx.GetHeight();
 	auto ray = RayUtils::fromNDC(xNDC, yNDC, gfx.GetCamera().GetInvMatrix(), gfx.GetInvProjection());
 	controlledPlanet->SetVecPosition(ray.origin + XMVectorScale(ray.direction, controlledPlanetDistAway));
+}
+
+void Game::CreatePlanetGrid(float radius, float spacing, float planetMass)
+{
+	constexpr float r2o2 = 0.70710678f; // sqrt(2)/2 for bounding sphere diagonal estimation
+	static std::mt19937 rng(std::random_device{}());
+	std::uniform_real_distribution<float> udist(-150.f, 150.f);
+
+	// Compute the maximum number of planets along one axis
+	float cellSize = 2 * radius + spacing;
+	size_t nX = static_cast<size_t>(boundingSphereSize * r2o2 * 2 / cellSize);
+
+	for (size_t xi = 0; xi < nX; ++xi)
+	{
+		for (size_t yi = 0; yi < nX; ++yi)
+		{
+			for (size_t zi = 0; zi < nX; ++zi)
+			{
+				// Calculate position in the grid
+				float xpos = -boundingSphereSize * r2o2 + xi * cellSize;
+				float ypos = -boundingSphereSize * r2o2 + yi * cellSize;
+				float zpos = -boundingSphereSize * r2o2 + zi * cellSize;
+
+				// Check if the position is within the bounding sphere
+				float distSquared = xpos * xpos + ypos * ypos + zpos * zpos;
+				if (distSquared <= boundingSphereSize * boundingSphereSize)
+				{
+					// Create the planet if within bounds
+					pPlanets.emplace_back(std::make_unique<Planet>(
+						gfx,
+						udist(rng),
+						dx::XMFLOAT3{ xpos, ypos, zpos },
+						radius
+					));
+					pPlanets.back()->SetMass(planetMass);
+				}
+			}
+		}
+	}
 }
 
