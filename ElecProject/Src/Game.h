@@ -2,6 +2,7 @@
 #include "Window.h"
 #include "FrameTimer.h"
 #include "Planet.h"
+#include "PlanetLogger.h"
 #include <functional>
 #include <optional>
 
@@ -15,6 +16,8 @@ public:
 	void Go();
 private:
 	void UpdateLogic();
+	void HandleKeyboardInput();
+
 
 	void SpawnControlWindow();
 
@@ -40,6 +43,7 @@ private:
 	Graphics& gfx;
 	FrameTimer ft;
 	std::vector<std::unique_ptr<Planet>> pPlanets;
+	PlanetLogger planetlog;
 private:
 	float dt = 0;
 	bool controllingPlanet = false;

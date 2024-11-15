@@ -152,6 +152,9 @@
     <ClInclude Include="Src\Ray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Src\PlanetLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Src\PixelShader.hlsl" />

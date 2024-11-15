@@ -260,3 +260,5 @@ paket-files/
 __pycache__/
 *.pyc
 *.shaderheader
+/ElecProject/PlanetLog.csv
+/ElecProject/imgui.ini

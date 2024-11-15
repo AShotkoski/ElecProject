@@ -115,6 +115,15 @@ void Game::UpdateLogic()
 		
 	}
 
+	HandleKeyboardInput();
+
+	SpawnControlWindow();
+	planetlog.Log(dt);
+}
+
+void Game::HandleKeyboardInput()
+{
+
 	// Keyboard Controls
 	while (const auto& kbdEvent = wnd.kbd.GetEvent())
 	{
@@ -134,22 +143,27 @@ void Game::UpdateLogic()
 					planet.SetVecVelocity(dx::XMVectorZero());
 					break;
 				case VK_DELETE:
+				{
 					auto it = std::find_if(pPlanets.begin(), pPlanets.end(), [&planet](const std::unique_ptr<Planet>& pl) {return pl.get() == &planet; });
 					pPlanets.erase(it);
+					break;
+				}
+				case 'L':
+					planetlog.Attach("PlanetLog.csv", &planet);
 					break;
 				}
 
 			}
 		}
 	}
-
-	SpawnControlWindow();
 }
 
 void Game::SpawnControlWindow()
 {
 	ImGui::Begin("Game control", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-	ImGui::TextColored({ 1,0,0,1 }, "There are %d planets", pPlanets.size());
+	if(planetlog.isPlanetAttached())
+		ImGui::TextColored({ 1,0,0,1 }, "Planet being logged!");
+	ImGui::TextColored({ 0.5f,0.1f,0,1 }, "There are %d planets", pPlanets.size());
 	ImGui::InputFloat("G", &Gravitational_Const, 0.0f, 0.0f, "%e");
 	ImGui::Checkbox("Physics", &isPhysicsEnabled);
 	ImGui::InputFloat("Bounding Sphere Radius", &boundingSphereSize);
