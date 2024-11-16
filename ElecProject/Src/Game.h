@@ -2,7 +2,6 @@
 #include "Window.h"
 #include "FrameTimer.h"
 #include "Planet.h"
-#include "PlanetLogger.h"
 #include <functional>
 #include <optional>
 
@@ -43,7 +42,6 @@ private:
 	Graphics& gfx;
 	FrameTimer ft;
 	std::vector<std::unique_ptr<Planet>> pPlanets;
-	PlanetLogger planetlog;
 private:
 	float dt = 0;
 	bool controllingPlanet = false;

@@ -152,7 +152,7 @@
     <ClInclude Include="Src\Ray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Src\PlanetLogger.h">
+    <ClInclude Include="Src\Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

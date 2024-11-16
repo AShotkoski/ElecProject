@@ -1,9 +1,10 @@
 #include "Game.h"
 #include <numbers>
-#include <d3dcompiler.h>
 #include "PhysEngine.h"
 #include "ImGuiCustom.h"
 #include "Ray.h"
+#include "Logger.h"
+#include <d3dcompiler.h>
 #include <random>
 
 namespace dx = DirectX;
@@ -30,7 +31,9 @@ Game::Game()
 
 	pPlanets[0]->SetMass(1e3);
 	pPlanets[1]->SetMass(1);
-	//pPlanets[2]->SetMass(1000);
+
+	Logger::Get().OpenFile("output.txt");
+	Logger::Get().LogHeader("ElapsedTime", "position.x", "position.y", "position.z", "mass");
 }
 
 Game::~Game()
@@ -43,6 +46,8 @@ void Game::Go()
 	gfx.BeginFrame();
 	UpdateLogic();
 	DrawFrame();
+
+	Logger::Get().Log(dt, pPlanets.front()->GetPosition(), pPlanets.front()->GetMass());
 
 	gfx.EndFrame();
 }
@@ -118,7 +123,6 @@ void Game::UpdateLogic()
 	HandleKeyboardInput();
 
 	SpawnControlWindow();
-	planetlog.Log(dt);
 }
 
 void Game::HandleKeyboardInput()
@@ -148,9 +152,6 @@ void Game::HandleKeyboardInput()
 					pPlanets.erase(it);
 					break;
 				}
-				case 'L':
-					planetlog.Attach("PlanetLog.csv", &planet);
-					break;
 				}
 
 			}
@@ -161,8 +162,6 @@ void Game::HandleKeyboardInput()
 void Game::SpawnControlWindow()
 {
 	ImGui::Begin("Game control", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-	if(planetlog.isPlanetAttached())
-		ImGui::TextColored({ 1,0,0,1 }, "Planet being logged!");
 	ImGui::TextColored({ 0.5f,0.1f,0,1 }, "There are %d planets", pPlanets.size());
 	ImGui::InputFloat("G", &Gravitational_Const, 0.0f, 0.0f, "%e");
 	ImGui::Checkbox("Physics", &isPhysicsEnabled);
