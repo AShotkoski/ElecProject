@@ -51,5 +51,6 @@ private:
     const float radius;
 
     bool ControlWindowEnabled = false;
+    bool isLogging = false;
 };
 

@@ -17,7 +17,7 @@ Game::Game()
 	// Setup the projection matrix
 	gfx.SetProjection(dx::XMMatrixPerspectiveFovLH(
 		dx::XMConvertToRadians(Fov), // FOV
-		(float) gfx.GetWidth() / (float)gfx.GetHeight(), // Aspect ratio
+		(float)gfx.GetWidth() / (float)gfx.GetHeight(), // Aspect ratio
 		NearClipping, // near clipping
 		FarClipping) // far clipping)
 	);
@@ -33,7 +33,6 @@ Game::Game()
 	pPlanets[1]->SetMass(1);
 
 	Logger::Get().OpenFile("output.txt");
-	Logger::Get().LogHeader("ElapsedTime", "position.x", "position.y", "position.z", "mass");
 }
 
 Game::~Game()
@@ -47,7 +46,8 @@ void Game::Go()
 	UpdateLogic();
 	DrawFrame();
 
-	Logger::Get().Log(dt, pPlanets.front()->GetPosition(), pPlanets.front()->GetMass());
+	// Update logger time
+	Logger::Get().UpdateTime(dt);
 
 	gfx.EndFrame();
 }

@@ -1,6 +1,7 @@
 #include "Planet.h"
 #include "Ray.h"
 #include "ImGuiCustom.h"
+#include "Logger.h"
 #include <cassert>
 
 Planet::Planet(Graphics& gfx, float patternseed, DirectX::XMFLOAT3 pos /*= { 0,0,0 }*/, float radius /*= 1.0f*/)
@@ -108,7 +109,7 @@ void Planet::DrawControlWindow()
 	title.append("##");
 	title.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
 
-	ImGui::Begin(title.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize );
+	ImGui::Begin(title.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
 	// Position
 	outdatedProperties |= ImGui::DragFloat3("Position", &position.x, 0.25f);
@@ -120,8 +121,18 @@ void Planet::DrawControlWindow()
 	{
 		SetVelocity(vel);
 	}
-	ImGui::End();
+	
+	// Logging
+	if (ImGui::Checkbox("Log Position", &isLogging))
+	{
+		Logger::Get().LogHeader("position.x", "position.y", "position.z");
+	}
 
+	if(isLogging)
+		Logger::Get().LogWithTime(GetPosition());
+	
+
+	ImGui::End();
 	if (outdatedProperties)
 		Sphere::updateCB();
 }

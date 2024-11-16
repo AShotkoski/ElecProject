@@ -32,14 +32,23 @@ public:
 			file.close();
 	}
 
+	void UpdateTime(float dt)
+	{
+		elapsedTime += dt;
+	}
+
 	template<typename... Args>
 	void LogHeader(Args&&... args)
 	{
+		// Log the Elapsed Time
+		LogValue("ElapsedTime");
+		file << ", ";
+
 		// Just redirect to log
-		Log(0.f, std::forward<Args>(args)...);	
+		Log(std::forward<Args>(args)...);	
 	}
 
-	// Generic log function redirects to private function
+	// Generic log function but adds elapsed time
 	template<typename... Args>
 	void Log(Args&&... args)
 	{
@@ -47,6 +56,12 @@ public:
 
 		LogValues(std::forward<Args>(args)...);
 		file << std::endl;
+	}
+	// Generic log function
+	template<typename... Args>
+	void LogWithTime(Args&&... args)
+	{
+		Log(elapsedTime, std::forward<Args>(args)...);
 	}
 
 private:
@@ -98,5 +113,6 @@ private:
 
 private:
 	std::ofstream file;
+	float elapsedTime = 0;
 };
 
