@@ -23,16 +23,16 @@ Game::Game()
 	);
 
 	// Add planets
-	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.f, dx::XMFLOAT3{ 0,0,0 }, 8.f));
-	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.5f, dx::XMFLOAT3{ 100,0,0 }, 10.0f));
+	pPlanets.emplace_back(std::make_unique<Planet>(gfx, -1.f, dx::XMFLOAT3{ 0,0,0 }, 16.f));
+	pPlanets.emplace_back(std::make_unique<Planet>(gfx, 0.5f, dx::XMFLOAT3{ 100,0,0 }, 7.0f));
 
-	pPlanets[0]->SetVelocity({ 0, 0,0 });
-	pPlanets[1]->SetVelocity({ 0, 0,0 });
+	pPlanets[0]->SetVelocity({ 0, 0, 5.f });
+	pPlanets[1]->SetVelocity({ 0, 6.f, -6.f });
 
 	pPlanets[0]->SetMass(1e3);
 	pPlanets[1]->SetMass(1);
 
-	Logger::Get().OpenFile("output.txt");
+	Logger::Get().OpenFile("output.csv");
 }
 
 Game::~Game()
